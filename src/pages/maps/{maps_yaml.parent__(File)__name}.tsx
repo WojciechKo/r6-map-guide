@@ -1,12 +1,12 @@
 import React from "react";
 import { graphql } from "gatsby";
 import Layout from "../../components/layout";
-import Map from "../../components/map";
+import MapViewer from "../../components/map_viewer";
 
 const MapPage = ({ data: { mapsYaml: mapData } }) => {
   return (
     <Layout>
-      <Map {...mapData} />
+      <MapViewer {...mapData} />
     </Layout>
   );
 };

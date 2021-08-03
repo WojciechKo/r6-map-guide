@@ -4,7 +4,6 @@ import Layout from "../../components/layout";
 
 const MapsPage = ({ data }) => (
   <Layout>
-    <h1>Pick a map:</h1>
     <ul>
       {data.allMapsYaml.nodes.map((map) => (
         <li key={map.parent.id}>
