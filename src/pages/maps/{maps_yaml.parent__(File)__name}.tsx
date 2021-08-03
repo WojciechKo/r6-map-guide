@@ -3,14 +3,10 @@ import { graphql } from "gatsby";
 import Layout from "../../components/layout";
 import Map from "../../components/map";
 
-const MapPage = ({ data }) => {
-  const {
-    mapsYaml: { name },
-  } = data;
-
+const MapPage = ({ data: { mapsYaml: mapData } }) => {
   return (
     <Layout>
-      <Map name={name} />
+      <Map {...mapData} />
     </Layout>
   );
 };
@@ -19,6 +15,11 @@ export const query = graphql`
   query QueryMapById($id: String) {
     mapsYaml(id: { eq: $id }) {
       name
+      blueprints {
+        name
+        url
+        level
+      }
     }
   }
 `;
