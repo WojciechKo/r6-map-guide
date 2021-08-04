@@ -24,7 +24,7 @@ const BlueprintContainer = styled.div`
   touch-action: none;
 `;
 
-const Blueprint = styled.div`
+const BlueprintFrame = styled.div`
   overflow: hidden;
   flex: 0 0 50%;
   height: 50%;
@@ -38,6 +38,10 @@ const Marker = styled.div`
   color: red;
   transform: translate(-50%, -50%);
 `;
+
+const Blueprint = styled(animated.div)`
+  position: relative;
+`
 
 const MapViewer = ({ blueprints }: MapProps) => {
   const [offset, setOffset] = useState(() => ({ x: 0, y: 0 }));
@@ -73,14 +77,14 @@ const MapViewer = ({ blueprints }: MapProps) => {
   return (
     <BlueprintContainer {...bindDrag()}>
       {blueprints.map((blueprint) => (
-        <Blueprint key={blueprint.level}>
-          <animated.div style={blueprintStyles}>
+        <BlueprintFrame key={blueprint.level}>
+          <Blueprint style={blueprintStyles}>
             <img src={blueprint.url} draggable={false} {...bindTap()} />
             <Marker {...markerPosition}>
               <BiRadioCircleMarked />
             </Marker>
-          </animated.div>
-        </Blueprint>
+          </Blueprint>
+        </BlueprintFrame>
       ))}
     </BlueprintContainer>
   );
