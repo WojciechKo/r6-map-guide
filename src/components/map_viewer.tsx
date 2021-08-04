@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { useSpring, animated } from "@react-spring/web";
 import { useDrag } from "react-use-gesture";
 import { useState } from "react";
+import { BiRadioCircleMarked } from "react-icons/bi";
 
 type MapProps = {
   name: string;
@@ -29,6 +30,15 @@ const Blueprint = styled.div`
   height: 50%;
 `;
 
+const Marker = styled.div`
+  position: absolute;
+  top: ${(props) => `${props.y}px`};
+  left: ${(props) => `${props.x}px`};
+  pointer-events: none;
+  color: red;
+  transform: translate(-50%, -50%);
+`;
+
 const MapViewer = ({ blueprints }: MapProps) => {
   const [offset, setOffset] = useState(() => ({ x: 0, y: 0 }));
   const [blueprintStyles, blueprintAnimation] = useSpring(() => offset);
@@ -44,15 +54,31 @@ const MapViewer = ({ blueprints }: MapProps) => {
     }
   });
 
+  const [markerPosition, setMarkerPosition] = useState(() => ({
+    x: undefined,
+    y: undefined,
+  }));
+
+  const bindTap = useDrag(({ tap, event }) => {
+    if (tap) {
+      const rect = event.target.getBoundingClientRect();
+
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+
+      setMarkerPosition({ x, y });
+    }
+  });
+
   return (
     <BlueprintContainer {...bindDrag()}>
       {blueprints.map((blueprint) => (
         <Blueprint key={blueprint.level}>
           <animated.div style={blueprintStyles}>
-            <img
-              src={blueprint.url}
-              draggable={false}
-            />
+            <img src={blueprint.url} draggable={false} {...bindTap()} />
+            <Marker {...markerPosition}>
+              <BiRadioCircleMarked />
+            </Marker>
           </animated.div>
         </Blueprint>
       ))}
