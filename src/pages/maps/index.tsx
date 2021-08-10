@@ -1,34 +1,9 @@
-import React from "react";
-import { Link, graphql } from "gatsby";
+import React, { useEffect } from "react";
+import { navigate } from "gatsby";
 
-import Layout from "../../components/layout";
-
-const MapsPage = ({ data }) => (
-  <Layout>
-    <ul>
-      {data.allMapsYaml.nodes.map((map) => (
-        <li key={map.parent.id}>
-          <Link to={`/maps/${map.parent.name}`}>{map.name}</Link>
-        </li>
-      ))}
-    </ul>
-  </Layout>
-);
-
-export const query = graphql`
-  query {
-    allMapsYaml(sort: { fields: name, order: ASC }) {
-      nodes {
-        parent {
-          ... on File {
-            id
-            name
-          }
-        }
-        name
-      }
-    }
-  }
-`;
+const MapsPage = () => {
+  useEffect(() => navigate(`/maps/bank`), [])
+  return <div />
+};
 
 export default MapsPage;
