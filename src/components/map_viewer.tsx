@@ -6,12 +6,12 @@ import { useState } from "react";
 import { BiRadioCircleMarked } from "react-icons/bi";
 
 type MapProps = {
+  id: string;
   name: string;
   blueprints: [
     {
       name: string;
       url: string;
-      level: number;
     }
   ];
 };
@@ -76,8 +76,8 @@ const MapViewer = ({ blueprints }: MapProps) => {
 
   return (
     <BlueprintContainer {...bindDrag()}>
-      {blueprints.map((blueprint) => (
-        <BlueprintFrame key={blueprint.level}>
+      {blueprints.map((blueprint, index) => (
+        <BlueprintFrame key={index}>
           <Blueprint style={blueprintStyles}>
             <img src={blueprint.url} draggable={false} {...bindTap()} />
             <Marker {...markerPosition}>

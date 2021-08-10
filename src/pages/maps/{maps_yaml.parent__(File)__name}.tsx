@@ -14,11 +14,11 @@ const MapPage = ({ data: { mapsYaml: mapData } }) => {
 export const query = graphql`
   query QueryMapById($id: String) {
     mapsYaml(id: { eq: $id }) {
+      id
       name
       blueprints {
         name
         url
-        level
       }
     }
   }
