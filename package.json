@@ -18,6 +18,7 @@
   "dependencies": {
     "@react-spring/web": "^9.2.4",
     "@types/js-yaml": "^4.0.2",
+    "@use-gesture/react": "^10.0.0-beta.22",
     "babel-plugin-styled-components": "^1.13.2",
     "gatsby": "^3.10.2",
     "gatsby-plugin-image": "^1.10.1",
@@ -29,7 +30,6 @@
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-icons": "^4.2.0",
-    "react-use-gesture": "^9.1.3",
     "styled-components": "^5.3.0",
     "styled-normalize": "^8.0.7"
   },

@@ -1,9 +1,7 @@
-import * as React from "react";
+import React from "react";
 import { Link, useStaticQuery, graphql } from "gatsby";
 import { Normalize } from "styled-normalize";
-import styled from "styled-components";
-
-import { createGlobalStyle } from "styled-components";
+import styled, { createGlobalStyle } from "styled-components";
 
 const GlobalStyle = createGlobalStyle`
   body {
@@ -28,12 +26,17 @@ const AppBar = styled.nav`
 `;
 
 const Page = styled.main`
+  height: 100%;
+  width: 100%;
   flex: 1 1;
   overflow: hidden;
   background: pink;
 `;
 
 const Layout = ({ children }) => {
+  document.addEventListener("gesturestart", (e) => e.preventDefault());
+  document.addEventListener("gesturechange", (e) => e.preventDefault());
+
   const data = useStaticQuery(graphql`
     query {
       site {
@@ -61,4 +64,5 @@ const Layout = ({ children }) => {
     </>
   );
 };
+
 export default Layout;
