@@ -1,14 +1,15 @@
+id: bank
 name: Bank
 blueprints:
   - name: Basement
-    url: https://staticctf.akamaized.net/J3yJr34U2pZ2Ieem48Dwy9uqj5PNUQTn/1DQ8HzVXAIpl5Flv1BNURw/9b9f39c18a1567f8b03ce708227ba816/r6-maps-bank-blueprint-1.jpg
-    level: 1
+    url: >-
+      https://staticctf.akamaized.net/J3yJr34U2pZ2Ieem48Dwy9uqj5PNUQTn/1DQ8HzVXAIpl5Flv1BNURw/de77d60c08b783c057d0bb29031e4d90/r6-maps-bank-blueprint-1.jpg
   - name: Ground
-    url: https://staticctf.akamaized.net/J3yJr34U2pZ2Ieem48Dwy9uqj5PNUQTn/6ZcnTtEXcYt8CrMsjbCvSu/40ac313886f599cc1c6efc26a22c25c3/r6-maps-bank-blueprint-2.jpg
-    level: 2
-  - name: 1st floor
-    url: https://staticctf.akamaized.net/J3yJr34U2pZ2Ieem48Dwy9uqj5PNUQTn/6ITkJP9lxHjVKzS9Ubcwtv/b405347dfd4ca3666b8098b33ac1412b/r6-maps-bank-blueprint-3.jpg
-    level: 3
+    url: >-
+      https://staticctf.akamaized.net/J3yJr34U2pZ2Ieem48Dwy9uqj5PNUQTn/6ZcnTtEXcYt8CrMsjbCvSu/40ac313886f599cc1c6efc26a22c25c3/r6-maps-bank-blueprint-2.jpg
+  - name: 1st Floor
+    url: >-
+      https://staticctf.akamaized.net/J3yJr34U2pZ2Ieem48Dwy9uqj5PNUQTn/6ITkJP9lxHjVKzS9Ubcwtv/b405347dfd4ca3666b8098b33ac1412b/r6-maps-bank-blueprint-3.jpg
   - name: Roof
-    url: https://staticctf.akamaized.net/J3yJr34U2pZ2Ieem48Dwy9uqj5PNUQTn/3iRfs8bs7ZDzQLiXtWH5sk/7ac363c15936b4b376300361cffd5d66/r6-maps-bank-blueprint-4.jpg
-    level: 4
+    url: >-
+      https://staticctf.akamaized.net/J3yJr34U2pZ2Ieem48Dwy9uqj5PNUQTn/3iRfs8bs7ZDzQLiXtWH5sk/7ac363c15936b4b376300361cffd5d66/r6-maps-bank-blueprint-4.jpg

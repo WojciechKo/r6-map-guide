@@ -1,0 +1,12 @@
+id: outback
+name: Outback
+blueprints:
+  - name: 1st Floor
+    url: >-
+      https://staticctf.akamaized.net/J3yJr34U2pZ2Ieem48Dwy9uqj5PNUQTn/66RRI7vfHhSPVbmx7oVxsm/814caa53862981412c9f53cacccd566f/r6-maps-outback-blueprint-2.jpg
+  - name: 2nd Floor
+    url: >-
+      https://staticctf.akamaized.net/J3yJr34U2pZ2Ieem48Dwy9uqj5PNUQTn/7jjNcQmgbqhjtZDHNttLha/241ed76774db23f8380cfd773cfda196/r6-maps-outback-blueprint-3.jpg
+  - name: Roof
+    url: >-
+      https://staticctf.akamaized.net/J3yJr34U2pZ2Ieem48Dwy9uqj5PNUQTn/3gAUdgvuYfrVPahwetBbGZ/98a540a2390ab4c91fc9de33575f5bd6/r6-maps-outback-blueprint-4.jpg

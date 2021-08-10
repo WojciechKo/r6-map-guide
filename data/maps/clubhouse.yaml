@@ -1,14 +1,15 @@
+id: clubhouse
 name: Clubhouse
 blueprints:
   - name: Basement
-    url: https://staticctf.akamaized.net/J3yJr34U2pZ2Ieem48Dwy9uqj5PNUQTn/6Zs2KBoWjSdaC3qssqwB9N/2231e145776f2d672f9cee3f5a417d65/r6-maps-clubhouse-blueprint-1.jpg
-    level: 1
+    url: >-
+      https://staticctf.akamaized.net/J3yJr34U2pZ2Ieem48Dwy9uqj5PNUQTn/6Zs2KBoWjSdaC3qssqwB9N/2231e145776f2d672f9cee3f5a417d65/r6-maps-clubhouse-blueprint-1.jpg
   - name: Ground
-    url: https://staticctf.akamaized.net/J3yJr34U2pZ2Ieem48Dwy9uqj5PNUQTn/3taneZwe0lPRHGvXcJZb6Q/fa084eaf2908a96b035a9e2cb50a181e/r6-maps-clubhouse-blueprint-2.jpg
-    level: 2
-  - name: 2nd floor
-    url: https://staticctf.akamaized.net/J3yJr34U2pZ2Ieem48Dwy9uqj5PNUQTn/4StUcsi07j6h4DPrmgF5rC/d50c816c50846d6fcf21938c6228fbd3/r6-maps-clubhouse-blueprint-3.jpg
-    level: 3
+    url: >-
+      https://staticctf.akamaized.net/J3yJr34U2pZ2Ieem48Dwy9uqj5PNUQTn/3taneZwe0lPRHGvXcJZb6Q/fa084eaf2908a96b035a9e2cb50a181e/r6-maps-clubhouse-blueprint-2.jpg
+  - name: 2nd Floor
+    url: >-
+      https://staticctf.akamaized.net/J3yJr34U2pZ2Ieem48Dwy9uqj5PNUQTn/4StUcsi07j6h4DPrmgF5rC/d50c816c50846d6fcf21938c6228fbd3/r6-maps-clubhouse-blueprint-3.jpg
   - name: Roof
-    url: https://staticctf.akamaized.net/J3yJr34U2pZ2Ieem48Dwy9uqj5PNUQTn/5tP8wrsOiDBfa7NzkUUCQQ/718d31824249f2f738b8bd38e12c3235/r6-maps-clubhouse-blueprint-4.jpg
-    level: 4
+    url: >-
+      https://staticctf.akamaized.net/J3yJr34U2pZ2Ieem48Dwy9uqj5PNUQTn/5tP8wrsOiDBfa7NzkUUCQQ/718d31824249f2f738b8bd38e12c3235/r6-maps-clubhouse-blueprint-4.jpg

@@ -1,0 +1,15 @@
+id: consulate
+name: Consulate
+blueprints:
+  - name: Basement
+    url: >-
+      https://staticctf.akamaized.net/J3yJr34U2pZ2Ieem48Dwy9uqj5PNUQTn/14Ww7AoFdDGhcjgWpLTMdV/cd15139f3ee18b64414d9a11c230b90e/r6-maps-consulate-blueprint-1.jpg
+  - name: Ground
+    url: >-
+      https://staticctf.akamaized.net/J3yJr34U2pZ2Ieem48Dwy9uqj5PNUQTn/v0KtqRwgoNXSvGxjn0MVR/7ab0794e86c4bca9d0f3f6df6e6c109c/r6-maps-consulate-blueprint-2.jpg
+  - name: 1st Floor
+    url: >-
+      https://staticctf.akamaized.net/J3yJr34U2pZ2Ieem48Dwy9uqj5PNUQTn/5Tu3Q2DYvBFyqszsrTwawU/5ed2e7d6f3892110bc23d05d0c383f47/r6-maps-consulate-blueprint-3.jpg
+  - name: Roof
+    url: >-
+      https://staticctf.akamaized.net/J3yJr34U2pZ2Ieem48Dwy9uqj5PNUQTn/7fTsFMVeL4crvNABSGRMxJ/91d24c9507cd76ee3f9c40b6ed49ac2d/r6-maps-consulate-blueprint-4.jpg

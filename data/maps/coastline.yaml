@@ -1,0 +1,12 @@
+id: coastline
+name: Coastline
+blueprints:
+  - name: 1st Floor
+    url: >-
+      https://staticctf.akamaized.net/J3yJr34U2pZ2Ieem48Dwy9uqj5PNUQTn/4b0lpXOb5Hv6kgJ2BvrjP9/25501b87b8c4daab98c7ff6dd1055580/r6-maps-coastline-blueprint-2.jpg
+  - name: 2nd Floor
+    url: >-
+      https://staticctf.akamaized.net/J3yJr34U2pZ2Ieem48Dwy9uqj5PNUQTn/5juDHwzsSzib8ljx1IzhUa/817340120fa8764b68cd95051a131667/r6-maps-coastline-blueprint-3.jpg
+  - name: Roof
+    url: >-
+      https://staticctf.akamaized.net/J3yJr34U2pZ2Ieem48Dwy9uqj5PNUQTn/2F2dvGQqZQk0AzfTN4VbT5/e58f0025a2bcfce3967e08a1f36d3e0f/r6-maps-coastline-blueprint-4.jpg
