@@ -3,12 +3,15 @@ import { graphql } from "gatsby";
 
 import Layout from "../../components/layout";
 import MapViewer from "../../components/mapViewer";
+import { SelectedMapContext } from "../../components/contexts/mapsContext";
 
-const MapPage = ({ data: { mapsYaml: mapData } }) => {
+const MapPage = ({ data: { mapsYaml: mapData }, pageContext: { id } }) => {
   return (
-    <Layout>
-      <MapViewer {...mapData} />
-    </Layout>
+    <SelectedMapContext.Provider value={id}>
+      <Layout>
+        <MapViewer {...mapData} />
+      </Layout>
+    </SelectedMapContext.Provider>
   );
 };
 

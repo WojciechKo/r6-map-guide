@@ -1,43 +1,51 @@
 import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import { useSpring, animated } from "@react-spring/web";
-import { useDrag, useGesture, useWheel } from '@use-gesture/react'
+import { useDrag, useGesture, useWheel } from "@use-gesture/react";
 import { BiRadioCircleMarked } from "react-icons/bi";
 
 import { useBlueprintReducer } from "./reducers";
 
 const BlueprintsContainer = styled.div`
+  ${({ theme, columns, rows }) => `
   height: 100%;
   width: 100%;
   user-select: none;
   display: grid;
-  grid-template-columns: ${(props) => `repeat(${props.columns}, 1fr)`};
-  grid-template-rows: ${(props) => `repeat(${props.rows}, 1fr)`};
+  grid-template-columns: ${`repeat(${columns}, 1fr)`};
+  grid-template-rows: ${`repeat(${rows}, 1fr)`};
   touch-action: none;
+  grid-gap: 4px;
+  background-color: ${theme.palette.secondary.dark};
+  `}
 `;
 
 const BlueprintFrame = styled.div`
+  ${({ theme }) => `
   overflow: hidden;
   touch-action: none;
+  background-color: ${theme.palette.primary.dark};
+  `}
 `;
 
 const Blueprint = styled(animated.div)`
   pointer-events: none;
 `;
 
-const Mover = styled(animated.div)`
-`;
+const Mover = styled(animated.div)``;
 
 const Zoomer = styled(animated.div)`
   transform-origin: top left;
 `;
 
 const Marker = styled.div`
+  ${({ theme, y, x }) => `
   position: absolute;
-  top: ${(props) => `${props.y}px`};
-  left: ${(props) => `${props.x}px`};
-  color: red;
+  top: ${`${y}px`};
+  left: ${`${x}px`};
+  color: ${theme.palette.error.main};
   transform: translate(-50%, -50%);
+  `}
 `;
 
 type MapProps = {
@@ -52,15 +60,19 @@ type MapProps = {
 };
 
 const MapViewer = ({ blueprints }: MapProps) => {
-  const [gridDimentions, setGridDimentions] = useState({ columns: 2, rows: 2 })
+  const [gridDimentions, setGridDimentions] = useState({ columns: 2, rows: 2 });
 
   const [
     { blueprintMove, blueprintScale, markerPosition },
     { moveBlueprint, zoomBlueprint, zoomBlueprint2, placeMarker },
   ] = useBlueprintReducer();
 
-  const [blueprintScaleStyles, blueprintScaleAnimation] = useSpring(() => blueprintScale);
-  const [blueprintMoveStyles, blueprintMoveAnimation] = useSpring(() => blueprintMove);
+  const [blueprintScaleStyles, blueprintScaleAnimation] = useSpring(
+    () => blueprintScale
+  );
+  const [blueprintMoveStyles, blueprintMoveAnimation] = useSpring(
+    () => blueprintMove
+  );
 
   const bindDragAndPinch = useGesture({
     onDrag: ({ offset: [x, y] }) => moveBlueprint({ x, y }),
@@ -69,7 +81,10 @@ const MapViewer = ({ blueprints }: MapProps) => {
         const rect = target.getBoundingClientRect();
         zoomBlueprint2({
           scale: dz,
-          focusPoint: { x: rect.width / gridDimentions.columns, y: rect.height / gridDimentions.rows },
+          focusPoint: {
+            x: rect.width / gridDimentions.columns,
+            y: rect.height / gridDimentions.rows,
+          },
         });
       }
     },
@@ -106,9 +121,13 @@ const MapViewer = ({ blueprints }: MapProps) => {
   }, [blueprintScale]);
 
   return (
-    <BlueprintsContainer rows={gridDimentions.rows} columns={gridDimentions.columns} {...bindDragAndPinch()}>
-      {blueprints.map((blueprint) => (
-        <BlueprintFrame key={blueprint.level} {...bindWheel()} {...bindTap()}>
+    <BlueprintsContainer
+      rows={gridDimentions.rows}
+      columns={gridDimentions.columns}
+      {...bindDragAndPinch()}
+    >
+      {blueprints.map((blueprint, index) => (
+        <BlueprintFrame key={index} {...bindWheel()} {...bindTap()}>
           <Blueprint>
             <Mover style={blueprintMoveStyles}>
               <Zoomer style={blueprintScaleStyles}>

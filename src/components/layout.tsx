@@ -1,36 +1,31 @@
 import React from "react";
-import { Link, useStaticQuery, graphql } from "gatsby";
-import { Normalize } from "styled-normalize";
-import styled, { createGlobalStyle } from "styled-components";
+import { Helmet } from "react-helmet";
+import { useStaticQuery, graphql } from "gatsby";
+import styled, { createGlobalStyle, ThemeProvider } from "styled-components";
+import { ThemeProvider as MuiThemeProvider } from "@material-ui/core/styles";
+import CssBaseline from "@material-ui/core/CssBaseline";
+
+import theme from "./theme";
+import AppBar from "./appBar";
+import { MapsContext } from "./contexts/mapsContext";
 
 const GlobalStyle = createGlobalStyle`
-  body {
-    background: blue;
+  a, a:hover, a:focus, a:active {
+    text-decoration: none;
+    color: inherit;
   }
 `;
 
-const Container = styled.main`
+const Container = styled.div`
   height: 100vh;
   width: 100vw;
   display: flex;
-  flex-flow: column;
-`;
-
-const AppBar = styled.nav`
-  background: green;
-  flex: 0 0 36px;
-  padding: 0 20px;
-  display: flex;
-  flex-flow: row nowrap;
-  align-items: center;
+  flex-flow: column nowrap;
 `;
 
 const Page = styled.main`
-  height: 100%;
-  width: 100%;
-  flex: 1 1;
   overflow: hidden;
-  background: pink;
+  flex: 1 1;
 `;
 
 const Layout = ({ children }) => {
@@ -44,24 +39,59 @@ const Layout = ({ children }) => {
           title
         }
       }
+      allMapsYaml(sort: { fields: name, order: ASC }) {
+        nodes {
+          parent {
+            ... on File {
+              id
+              name
+            }
+          }
+          name
+        }
+      }
     }
   `);
 
+  const maps = data.allMapsYaml.nodes.map((mapData) => ({
+    name: mapData.name,
+    id: mapData.parent.name,
+  }));
+
   return (
-    <>
-      <Normalize />
-      <GlobalStyle />
+    <MuiThemeProvider theme={theme}>
+      <ThemeProvider theme={theme}>
+        <MapsContext.Provider value={maps}>
+          <CssBaseline />
+          <GlobalStyle />
 
-      <title>{data.site.siteMetadata.title}</title>
+          <Helmet>
+            <meta charSet="utf-8" />
+            <title>{data.site.siteMetadata.title}</title>
 
-      <Container>
-        <AppBar>
-          <Link to="/maps">Maps</Link>
-        </AppBar>
+            <meta
+              name="viewport"
+              content="minimum-scale=1, initial-scale=1, width=device-width"
+            />
 
-        <Page>{children}</Page>
-      </Container>
-    </>
+            <link
+              rel="stylesheet"
+              href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
+            />
+            <link
+              rel="stylesheet"
+              href="https://fonts.googleapis.com/icon?family=Material+Icons"
+            />
+          </Helmet>
+
+          <Container>
+            <AppBar />
+
+            <Page>{children}</Page>
+          </Container>
+        </MapsContext.Provider>
+      </ThemeProvider>
+    </MuiThemeProvider>
   );
 };
 
