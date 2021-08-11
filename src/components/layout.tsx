@@ -29,9 +29,6 @@ const Page = styled.main`
 `;
 
 const Layout = ({ children }) => {
-  document.addEventListener("gesturestart", (e) => e.preventDefault());
-  document.addEventListener("gesturechange", (e) => e.preventDefault());
-
   const data = useStaticQuery(graphql`
     query {
       site {
