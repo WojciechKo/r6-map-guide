@@ -18,7 +18,7 @@ export function blueprintReducer(state, action) {
       const scaleJump = 1.1;
       const scale = action.payload.scale < 0
         ? Math.min(5, state.blueprintScale.scale * scaleJump)
-        : Math.max(1, state.blueprintScale.scale / scaleJump);
+        : Math.max(0.1, state.blueprintScale.scale / scaleJump);
 
       const scaleRatio = scale / state.blueprintScale.scale;
 
