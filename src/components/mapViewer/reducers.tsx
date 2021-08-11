@@ -50,7 +50,7 @@ export function blueprintReducer(state, action) {
     case "zoom-blueprint2": {
       const scale = action.payload.scale > 0
         ? Math.min(5, state.blueprintScale.scale + action.payload.scale)
-        : Math.max(1, state.blueprintScale.scale + action.payload.scale);
+        : Math.max(0.1, state.blueprintScale.scale + action.payload.scale);
 
         console.log(scale);
       const scaleRatio = scale / state.blueprintScale.scale;
