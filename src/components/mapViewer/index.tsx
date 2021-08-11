@@ -126,7 +126,7 @@ const MapViewer = ({ blueprints }: MapProps) => {
       columns={gridDimentions.columns}
       {...bindDragAndPinch()}
     >
-      {blueprints.map((blueprint, index) => (
+      {blueprints.slice(0, 4).map((blueprint, index) => (
         <BlueprintFrame key={index} {...bindWheel()} {...bindTap()}>
           <Blueprint>
             <Mover style={blueprintMoveStyles}>
