@@ -4,7 +4,6 @@ exports.createPages = ({ actions }) => {
   createRedirect({
     fromPath: `/`,
     toPath: `/maps`,
-    redirectInBrowser: true,
     isPermanent: true,
   });
 };
