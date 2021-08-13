@@ -1,30 +1,22 @@
-import React from "react";
-
-import { createStyles, makeStyles } from "@material-ui/core/styles";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
-
+import React from "react";
+import styled from "styled-components";
 import MapPicker from "./mapPicker";
 import Settings from "./settings";
 
-const useStyles = makeStyles(() =>
-  createStyles({
-    appbarContent: {
-      justifyContent: 'space-between'
-    }
-  })
-);
+const StyledToolbar = styled(Toolbar)`
+  justify-content: space-between;
+`
 
 export default () => {
-  const classes = useStyles();
-
   return (
     <AppBar position="static" color="primary">
-      <Toolbar className={classes.appbarContent}>
+      <StyledToolbar>
         <MapPicker />
 
         <Settings />
-      </Toolbar>
+      </StyledToolbar>
     </AppBar>
   );
 };
