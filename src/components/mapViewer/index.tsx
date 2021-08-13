@@ -1,30 +1,29 @@
-import React, { useEffect, useRef, useState } from "react";
-import styled from "styled-components";
-import { useSpring, animated } from "@react-spring/web";
+import { animated, useSpring } from "@react-spring/web";
 import { useDrag, useGesture, useWheel } from "@use-gesture/react";
+import React, { useEffect, useState } from "react";
 import { BiRadioCircleMarked } from "react-icons/bi";
-
+import styled from "styled-components";
 import { useBlueprintReducer } from "./reducers";
 
 const BlueprintsContainer = styled.div`
   ${({ theme, columns, rows }) => `
-  height: 100%;
-  width: 100%;
-  user-select: none;
-  display: grid;
-  grid-template-columns: ${`repeat(${columns}, 1fr)`};
-  grid-template-rows: ${`repeat(${rows}, 1fr)`};
-  touch-action: none;
-  grid-gap: 4px;
-  background-color: ${theme.palette.secondary.dark};
+    background-color: ${theme.palette.secondary.main};
+    height: 100%;
+    width: 100%;
+    user-select: none;
+    touch-action: none;
+    display: grid;
+    grid-template-columns: ${`repeat(${columns}, 1fr)`};
+    grid-template-rows: ${`repeat(${rows}, 1fr)`};
+    grid-gap: 3px;
   `}
 `;
 
 const BlueprintFrame = styled.div`
   ${({ theme }) => `
-  overflow: hidden;
-  touch-action: none;
-  background-color: ${theme.palette.primary.dark};
+    background-color: ${theme.palette.primary.dark};
+    overflow: hidden;
+    touch-action: none;
   `}
 `;
 
@@ -40,11 +39,11 @@ const Zoomer = styled(animated.div)`
 
 const Marker = styled.div`
   ${({ theme, y, x }) => `
-  position: absolute;
-  top: ${`${y}px`};
-  left: ${`${x}px`};
-  color: ${theme.palette.error.main};
-  transform: translate(-50%, -50%);
+    position: absolute;
+    top: ${`${y}px`};
+    left: ${`${x}px`};
+    color: ${theme.palette.error.main};
+    transform: translate(-50%, -50%);
   `}
 `;
 
