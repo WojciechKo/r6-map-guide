@@ -7,7 +7,7 @@ import CssBaseline from "@material-ui/core/CssBaseline";
 
 import theme from "./theme";
 import AppBar from "./appBar";
-import { MapsContext } from "./contexts/mapsContext";
+import { MapsContext } from "../contexts/mapsContext";
 
 const GlobalStyle = createGlobalStyle`
   a, a:hover, a:focus, a:active {

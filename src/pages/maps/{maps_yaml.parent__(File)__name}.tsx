@@ -1,9 +1,8 @@
-import React from "react";
 import { graphql } from "gatsby";
-
+import React from "react";
 import Layout from "../../components/layout";
 import MapViewer from "../../components/mapViewer";
-import { SelectedMapContext } from "../../components/contexts/mapsContext";
+import { SelectedMapContext } from "../../contexts/mapsContext";
 
 const MapPage = ({ data: { mapsYaml: mapData }, pageContext: { id } }) => {
   return (
