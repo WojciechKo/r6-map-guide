@@ -22,6 +22,7 @@ const BlueprintsContainer = styled.div`
 const BlueprintFrame = styled.div`
   ${({ theme }) => `
     background-color: ${theme.palette.primary.dark};
+    position: relative;
     overflow: hidden;
     touch-action: none;
   `}
