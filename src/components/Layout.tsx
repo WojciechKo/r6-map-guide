@@ -1,13 +1,13 @@
+import CssBaseline from "@material-ui/core/CssBaseline";
+import { ThemeProvider as MuiThemeProvider } from "@material-ui/core/styles";
+import { graphql, useStaticQuery } from "gatsby";
 import React from "react";
 import { Helmet } from "react-helmet";
-import { useStaticQuery, graphql } from "gatsby";
 import styled, { createGlobalStyle, ThemeProvider } from "styled-components";
-import { ThemeProvider as MuiThemeProvider } from "@material-ui/core/styles";
-import CssBaseline from "@material-ui/core/CssBaseline";
-
-import theme from "./theme";
-import AppBar from "./AppBar";
+import { GridContextProvider } from "../contexts/GridContext";
 import { MapsContext } from "../contexts/MapsContext";
+import AppBar from "./AppBar";
+import theme from "./theme";
 
 const GlobalStyle = createGlobalStyle`
   a, a:hover, a:focus, a:active {
@@ -59,33 +59,35 @@ const Layout = ({ children }) => {
     <MuiThemeProvider theme={theme}>
       <ThemeProvider theme={theme}>
         <MapsContext.Provider value={maps}>
-          <CssBaseline />
-          <GlobalStyle />
+          <GridContextProvider>
+            <CssBaseline />
+            <GlobalStyle />
 
-          <Helmet>
-            <meta charSet="utf-8" />
-            <title>{data.site.siteMetadata.title}</title>
+            <Helmet>
+              <meta charSet="utf-8" />
+              <title>{data.site.siteMetadata.title}</title>
 
-            <meta
-              name="viewport"
-              content="minimum-scale=1, initial-scale=1, width=device-width"
-            />
+              <meta
+                name="viewport"
+                content="minimum-scale=1, initial-scale=1, width=device-width"
+              />
 
-            <link
-              rel="stylesheet"
-              href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
-            />
-            <link
-              rel="stylesheet"
-              href="https://fonts.googleapis.com/icon?family=Material+Icons"
-            />
-          </Helmet>
+              <link
+                rel="stylesheet"
+                href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
+              />
+              <link
+                rel="stylesheet"
+                href="https://fonts.googleapis.com/icon?family=Material+Icons"
+              />
+            </Helmet>
 
-          <Container>
-            <AppBar />
+            <Container>
+              <AppBar />
 
-            <Page>{children}</Page>
-          </Container>
+              <Page>{children}</Page>
+            </Container>
+          </GridContextProvider>
         </MapsContext.Provider>
       </ThemeProvider>
     </MuiThemeProvider>

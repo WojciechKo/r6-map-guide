@@ -3,6 +3,7 @@ import { useDrag, useGesture, useWheel } from "@use-gesture/react";
 import React, { useEffect, useState } from "react";
 import { BiRadioCircleMarked } from "react-icons/bi";
 import styled from "styled-components";
+import { useGridContext } from "../../contexts/GridContext";
 import { useBlueprintReducer } from "./reducers";
 
 const BlueprintsContainer = styled.div`
@@ -60,7 +61,8 @@ type MapProps = {
 };
 
 const MapViewer = ({ blueprints }: MapProps) => {
-  const [gridDimentions, setGridDimentions] = useState({ columns: 2, rows: 2 });
+  const {grid} = useGridContext();
+  // const [gridDimentions, setGridDimentions] = useState({ columns: 2, rows: 2 });
 
   const [
     { blueprintMove, blueprintScale, markerPosition },
@@ -82,8 +84,8 @@ const MapViewer = ({ blueprints }: MapProps) => {
         zoomBlueprint2({
           scale: dz,
           focusPoint: {
-            x: rect.width / gridDimentions.columns,
-            y: rect.height / gridDimentions.rows,
+            x: rect.width / grid.columns,
+            y: rect.height / grid.rows,
           },
         });
       }
@@ -122,16 +124,16 @@ const MapViewer = ({ blueprints }: MapProps) => {
 
   return (
     <BlueprintsContainer
-      rows={gridDimentions.rows}
-      columns={gridDimentions.columns}
+      rows={grid.rows}
+      columns={grid.columns}
       {...bindDragAndPinch()}
     >
-      {blueprints.slice(0, 4).map((blueprint, index) => (
+      {[...Array(grid.rows * grid.columns)].map((_, index) => (
         <BlueprintFrame key={index} {...bindWheel()} {...bindTap()}>
           <Blueprint>
             <Mover style={blueprintMoveStyles}>
               <Zoomer style={blueprintScaleStyles}>
-                <img src={blueprint.url} />
+                <img src={blueprints[index]?.url} />
                 <Marker {...markerPosition}>
                   <BiRadioCircleMarked />
                 </Marker>

@@ -3,6 +3,7 @@ import Toolbar from "@material-ui/core/Toolbar";
 import React from "react";
 import styled from "styled-components";
 import MapSelector from "./MapSelector";
+import GridSelector from "./GridSelector";
 import Settings from "./Settings";
 
 const StyledToolbar = styled(Toolbar)`
@@ -14,6 +15,8 @@ export default () => {
     <AppBar position="static" color="primary">
       <StyledToolbar>
         <MapSelector />
+
+        <GridSelector />
 
         <Settings />
       </StyledToolbar>

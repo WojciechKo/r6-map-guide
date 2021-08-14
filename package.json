@@ -33,11 +33,13 @@
     "gatsby-source-filesystem": "^3.10.0",
     "gatsby-transformer-sharp": "^3.10.0",
     "gatsby-transformer-yaml": "^3.10.0",
+    "immer": "^9.0.5",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-helmet": "^6.1.0",
     "react-icons": "^4.2.0",
-    "styled-components": "^5.3.0"
+    "styled-components": "^5.3.0",
+    "use-immer": "^0.6.0"
   },
   "devDependencies": {
     "@supercharge/promise-pool": "^1.7.0",
