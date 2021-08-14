@@ -1,8 +1,8 @@
 import { navigate } from "gatsby";
 import React, { useContext, useState } from "react";
-import { MapsContext, SelectedMapContext } from "../../../contexts/mapsContext";
-import MapSelectorButton from "./mapSelectorButton";
-import MapSelectorMenu from "./mapSelectorMenu";
+import { MapsContext, SelectedMapContext } from "../../../contexts/MapsContext";
+import MapSelectorButton from "./MapSelectorButton";
+import MapSelectorMenu from "./MapSelectorMenu";
 
 const MapSelector = () => {
   const maps = useContext(MapsContext);

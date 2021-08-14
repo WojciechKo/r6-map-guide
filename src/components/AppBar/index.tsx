@@ -2,8 +2,8 @@ import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import React from "react";
 import styled from "styled-components";
-import MapSelector from "./mapSelector";
-import Settings from "./settings";
+import MapSelector from "./MapSelector";
+import Settings from "./Settings";
 
 const StyledToolbar = styled(Toolbar)`
   justify-content: space-between;

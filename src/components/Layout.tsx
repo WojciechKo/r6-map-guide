@@ -6,8 +6,8 @@ import { ThemeProvider as MuiThemeProvider } from "@material-ui/core/styles";
 import CssBaseline from "@material-ui/core/CssBaseline";
 
 import theme from "./theme";
-import AppBar from "./appBar";
-import { MapsContext } from "../contexts/mapsContext";
+import AppBar from "./AppBar";
+import { MapsContext } from "../contexts/MapsContext";
 
 const GlobalStyle = createGlobalStyle`
   a, a:hover, a:focus, a:active {
