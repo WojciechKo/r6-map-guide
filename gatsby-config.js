@@ -24,6 +24,6 @@ module.exports = {
         path: `${__dirname}/data/`,
       },
     },
-    `gatsby-plugin-meta-redirect`
+    `gatsby-plugin-netlify`
   ],
 };
