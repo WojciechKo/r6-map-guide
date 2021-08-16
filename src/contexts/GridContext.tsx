@@ -3,19 +3,24 @@ import { useContext } from "react";
 
 const GridContext = React.createContext(null);
 
-const useGridContext = () => {
-    return useContext(GridContext);
+const GridContextProvider = (props) => {
+  const GridLocalStorageId = "map-grid";
+  const storedGrid = JSON.parse(localStorage.getItem(GridLocalStorageId));
+
+  const defaultGrid = { columns: 2, rows: 2 };
+  const [grid, setGridState] = useState(storedGrid || defaultGrid);
+
+  const setGrid = (grid) => {
+    localStorage.setItem(GridLocalStorageId, JSON.stringify(grid));
+    setGridState(grid);
+  };
+
+  const value = { grid, setGrid };
+  return <GridContext.Provider value={value} {...props} />;
 };
 
-const GridContextProvider = (props) => {
-  const [grid, setGrid] = useState({ rows: 2, columns: 2 });
-  console.log(grid);
-
-  const value = {
-    grid,
-    setGrid: ({ rows, columns }) => setGrid({ rows, columns }),
-  };
-  return <GridContext.Provider value={value} {...props} />;
+const useGridContext = () => {
+  return useContext(GridContext);
 };
 
 export { GridContextProvider, useGridContext };
