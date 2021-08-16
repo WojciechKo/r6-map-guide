@@ -17,8 +17,9 @@ const GlobalStyle = createGlobalStyle`
 `;
 
 const Container = styled.div`
-  height: 100vh;
-  width: 100vw;
+  height: 100%;
+  width: 100%;
+  position: fixed;
   display: flex;
   flex-flow: column nowrap;
 `;
