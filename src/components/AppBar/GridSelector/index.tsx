@@ -1,9 +1,10 @@
 import IconButton from "@material-ui/core/IconButton";
 import Popover from "@material-ui/core/Popover";
-import React, { useContext } from "react";
+import { useDrag, useGesture, useHover } from "@use-gesture/react";
+import React from "react";
 import { RiLayoutGridLine } from "react-icons/ri";
 import styled from "styled-components";
-import { GridContext, useGridContext } from "../../../contexts/GridContext";
+import { useGridContext } from "../../../contexts/GridContext";
 
 const GridSelectorButton = styled(IconButton)`
   ${({ theme }) => `
@@ -17,6 +18,7 @@ interface ContainerProps {
 const Container = styled.div<ContainerProps>`
   ${({ theme, dimention }) => `
     display: grid;
+    touch-action: none;
     grid-template-rows: repeat(${dimention}, 1fr);
     grid-template-columns: repeat(${dimention}, 1fr);
     margin: ${theme.spacing(2)}px ${theme.spacing(1)}px;
@@ -36,20 +38,48 @@ const StyledGridItem = styled.div<{ selected: boolean }>`
 `;
 
 const GridItemIndicator = styled.div`
-  width: 1em;
-  height: 1em;
+  width: 3em;
+  height: 3em;
   border-radius: 2px;
   background: currentColor;
 `;
 
-const GridItem = ({ onHover, selected, onClick }) => (
-  <StyledGridItem onMouseOver={onHover} selected={selected} onClick={onClick}>
-    <GridItemIndicator />
-  </StyledGridItem>
-);
+const GridItem = ({ index, onHover, selected, onClick }) => {
+  const bindGestures = useGesture({
+    onHover: ({ args: [callback] }) => {
+      callback();
+    },
+  });
+
+  const onTouchMove = (event) => {
+    const myLocation = event.touches[0];
+    const realTarget = document.elementFromPoint(
+      myLocation.clientX,
+      myLocation.clientY
+    );
+    const index = parseInt(realTarget.getAttribute("data-index"));
+    if (isNaN(index)) {
+      return;
+    }
+
+    onHover(index);
+  };
+
+  return (
+    <StyledGridItem
+      selected={selected}
+      onTouchMove={onTouchMove}
+      onTouchStart={() => onHover(index)}
+      data-index={index}
+      // onClick={onClick}
+    >
+      <GridItemIndicator />
+    </StyledGridItem>
+  );
+};
 
 const GridSelector = () => {
-  const {grid, setGrid} = useGridContext();
+  const { grid, setGrid } = useGridContext();
   const dimention = 4;
 
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -65,7 +95,12 @@ const GridSelector = () => {
   const open = Boolean(anchorEl);
   const id = open ? "simple-popover" : undefined;
 
-  const xy = (index) => [index % dimention + 1, Math.floor(index / dimention) + 1];
+  const xy = (index) => [
+    (index % dimention) + 1,
+    Math.floor(index / dimention) + 1,
+  ];
+
+  const index = (x, y) => (y - 1) * dimention + x - 1;
 
   const generateGridItems = (selectedIndex) => {
     const [selectedX, selectedY] = xy(selectedIndex);
@@ -78,18 +113,23 @@ const GridSelector = () => {
     return [...Array(dimention * dimention)].map((_, index) => selected(index));
   };
 
+  // const [gridItems, setGridItems] = React.useState(
+  //   generateGridItems(index(grid.columns, grid.rows))
+  // );
+
+  const gridItems = generateGridItems(index(grid.columns, grid.rows));
+
   const selectGrid = (index) => {
-    setGridItems(generateGridItems(index));
+    const [columns, rows] = xy(index);
+    setGrid({ columns, rows });
+
+    // setGridItems(generateGridItems(index));
   };
 
-  const [gridItems, setGridItems] = React.useState(
-    generateGridItems(dimention)
-  );
-
   const updateLayout = (index) => {
-    const [x, y] = xy(index);
-    setGrid({rows: y, columns: x});
-  }
+    const [columns, rows] = xy(index);
+    setGrid({ columns, rows });
+  };
 
   return (
     <div>
@@ -121,7 +161,8 @@ const GridSelector = () => {
           {gridItems.map((gridItem, index) => (
             <GridItem
               key={index}
-              onHover={() => selectGrid(index)}
+              index={index}
+              onHover={(idx) => selectGrid(idx)}
               selected={gridItem}
               onClick={() => updateLayout(index)}
             />
