@@ -5,10 +5,16 @@ const GridContext = React.createContext(null);
 
 const GridContextProvider = (props) => {
   const GridLocalStorageId = "map-grid";
-  const storedGrid = JSON.parse(localStorage.getItem(GridLocalStorageId));
 
   const defaultGrid = { columns: 2, rows: 2 };
-  const [grid, setGridState] = useState(storedGrid || defaultGrid);
+  const [grid, setGridState] = useState(defaultGrid);
+
+  useEffect(() => {
+    const storedGrid = JSON.parse(localStorage.getItem(GridLocalStorageId));
+    if (storedGrid) {
+      setGridState(storedGrid);
+    };
+  }, []);
 
   const setGrid = (grid) => {
     localStorage.setItem(GridLocalStorageId, JSON.stringify(grid));
