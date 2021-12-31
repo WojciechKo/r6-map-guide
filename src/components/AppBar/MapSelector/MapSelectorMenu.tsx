@@ -34,6 +34,15 @@ const StyledMenuItem = styled(MenuItem)`
   `}
 `;
 
+interface MapSelectorMenuProps {
+  anchorEl: any;
+  isMenuOpen: any;
+  maps: any;
+  selectedMapId: any;
+  onClickAway: () => void;
+  onMapSelected: () => void;
+}
+
 const MapSelectorMenu = ({
   anchorEl,
   isMenuOpen,
@@ -41,7 +50,7 @@ const MapSelectorMenu = ({
   maps,
   selectedMapId,
   onMapSelected,
-}) => {
+}: MapSelectorMenuProps) => {
   return (
     <Popper
       open={isMenuOpen}

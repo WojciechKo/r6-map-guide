@@ -13,7 +13,9 @@
     "build": "gatsby build",
     "serve": "gatsby serve",
     "clean": "gatsby clean",
-    "updateMaps": "node lib/mapsUpdater.js"
+    "updateMaps": "node lib/mapsUpdater.js",
+    "storybook": "start-storybook -p 6006",
+    "build-storybook": "build-storybook"
   },
   "dependencies": {
     "@material-ui/core": "^4.12.3",
@@ -42,10 +44,18 @@
     "use-immer": "^0.6.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.15.0",
+    "@storybook/addon-actions": "^6.3.7",
+    "@storybook/addon-essentials": "^6.3.7",
+    "@storybook/addon-links": "^6.3.7",
+    "@storybook/builder-webpack5": "^6.3.7",
+    "@storybook/manager-webpack5": "^6.3.7",
+    "@storybook/react": "^6.3.7",
     "@supercharge/promise-pool": "^1.7.0",
     "@types/styled-components": "^5.1.12",
     "@typescript-eslint/eslint-plugin": "^4.29.0",
     "@typescript-eslint/parser": "^4.29.0",
+    "babel-loader": "^8.2.2",
     "eslint": "^7.32.0",
     "eslint-plugin-react": "^7.24.0",
     "js-yaml": "^4.1.0",
