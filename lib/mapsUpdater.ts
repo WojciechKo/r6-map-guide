@@ -1,82 +1,96 @@
-const puppeteer = require('puppeteer');
-const yaml = require('js-yaml');
-const fs = require('fs');
-const PromisePool = require('@supercharge/promise-pool')
+import puppeteer, { Browser } from "puppeteer";
+import yaml from "js-yaml";
+import fs from "fs";
+import PromisePool from "@supercharge/promise-pool";
 
-const toTitleCase = (phrase) => phrase.trim()
-  .toLowerCase()
-  .split(' ')
-  .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-  .join(' ');
+const toTitleCase = (phrase: string) =>
+  phrase
+    .trim()
+    .toLowerCase()
+    .split(" ")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
 
-const fetchMapsUrls = async (browser) => {
+const fetchMapsUrls = async (browser: Browser) => {
   const page = await browser.newPage();
-  await page.goto('https://www.ubisoft.com/en-us/game/rainbow-six/siege/game-info/maps', {
-    waitUntil: 'networkidle0',
+  await page.goto("https://www.ubisoft.com/en-us/game/rainbow-six/siege/game-info/maps", {
+    waitUntil: "networkidle0",
   });
 
-  await page.click('.privacy__modal__accept');
+  await page.click(".privacy__modal__accept");
 
-  return page.$$eval('.maplist__cards__wrapper a[href]', elements => elements.map(el => el.href));
-}
+  const urls = page.$$eval(".maplist__cards__wrapper a[href]", (elements) => elements.map((el) => el.href));
+  return urls;
+};
 
-const fetchMapData = (browser, url) => new Promise(async (resolve) => {
-  const id = url.split('/').at(-1);
+type MapData = {
+  id: string;
+  name: string;
+  blueprints: { name: string; url: string }[];
+};
 
-  console.log(`[MapFetch] - ${id}`);
-  console.time(`[MapFetch] - ${id}`);
+const fetchMapData = async (browser: Browser, url: string): Promise<MapData> => {
+  const id = url.split("/").at(-1);
+
+  if (typeof id === "undefined") {
+    throw Error(`Map id not found url=${url}`);
+  }
+
+  console.log(`MapFetching - ${id}`);
+  console.time(`MapFetching - ${id}`);
 
   const mapPage = await browser.newPage();
-  await mapPage.goto(url, { waitUntil: 'networkidle0' });
-  // await mapPage.waitForSelector('.map-details__gallery')
+  await mapPage.goto(url, { waitUntil: "networkidle0" });
 
+  const titleContent = await mapPage.$eval(".map-details__info__title", (el) => el.textContent);
+  if (!titleContent) {
+    throw Error(`Map title not found url=${url}`);
+  }
+  const name = toTitleCase(titleContent);
 
-  const name = await mapPage.$eval('.map-details__info__title', el => el.textContent)
-    .then(toTitleCase)
+  const blueprintsNames = await mapPage
+    .$$eval(".map-details__gallery .gallery__item span", (elements) => elements.map((el) => el.textContent))
+    .then((names) => names.filter((m): m is string => typeof m == "string").map(toTitleCase));
 
-  const blueprintsName = await mapPage.$$eval('.map-details__gallery .gallery__item span', elements => elements.map(el => el.textContent))
-    .then(names => names.map(toTitleCase))
-
-  await mapPage.click('.map-details__gallery .gallery__item img')
+  await mapPage.click(".map-details__gallery .gallery__item img");
   // await mapPage.waitForSelector('.react-images__dialog')
 
-  const blueprintUrls = await mapPage.$$eval('.react-images__view > img', elements => elements.map(el => el.src))
-  const blueprints = blueprintsName.map((name, index) => ({ name, url: blueprintUrls[index] }))
+  const blueprintUrls = await mapPage.$$eval(".react-images__view > img", (elements) => elements.map((el) => el.src));
+  const blueprints = blueprintsNames.map((name, index) => ({
+    name,
+    url: blueprintUrls[index],
+  }));
 
-  console.timeEnd(`[MapFetch] - ${id}`);
-
-  resolve({ id, name, blueprints });
   await mapPage.close();
-})
 
-const fetchMapsData = async () => {
+  console.timeEnd(`MapFetching - ${id}`);
+
+  return { id, name, blueprints };
+};
+
+const writeToFile = (mapData: MapData) => {
+  try {
+    const filename = `data/maps/${mapData.id}.yaml`;
+    fs.writeFileSync(filename, yaml.dump(mapData));
+
+    console.log(`MapSaved - ${filename}`);
+  } catch (e) {
+    console.log(e);
+  }
+};
+
+(async () => {
+  console.log("Fetching maps...");
+
   const browser = await puppeteer.launch({ headless: true });
 
   const mapsUrls = await fetchMapsUrls(browser);
 
-  const { results: maps } = await PromisePool
-    .withConcurrency(8)
+  await PromisePool.withConcurrency(8)
     .for(mapsUrls)
-    .process((url) => fetchMapData(browser, url))
+    .process((url) => fetchMapData(browser, url).then(writeToFile));
 
   await browser.close();
-  return maps;
-}
 
-(async () => {
-  console.log("[AllMapsFetch]");
-  console.time("[AllMapsFetch]");
-  const maps = await fetchMapsData()
-  console.timeEnd("[AllMapsFetch]");
-
-  for (mapData of maps) {
-    try {
-      const filename = `data/maps/${mapData.id}.yaml`
-      fs.writeFileSync(filename, yaml.dump(mapData));
-
-      console.log(`[UpdateMapFile] - ${filename}`);
-    } catch (e) {
-      console.log(e);
-    }
-  }
+  console.log("Done!");
 })();
