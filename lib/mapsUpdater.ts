@@ -1,5 +1,5 @@
 import Bottleneck from "bottleneck";
-import { exec } from "child_process";
+import { spawn } from "child_process";
 import { promises as fs } from "fs";
 import yaml from "js-yaml";
 import { Listr } from "listr2";
@@ -145,18 +145,46 @@ const updateMaps = async (r6Api: R6Api, maps: MapUrl[]) => {
   ).run();
 };
 
+type Command = [string, string[]];
+
+const createGitCommit = () => {
+  const printCommand = (command: Command) => console.log("$", command[0], ...command[1]);
+
+  console.log("");
+  console.log("# Add maps to stage");
+  const gitAddCommand: Command = ["git", ["add", "-v", "data"]];
+  printCommand(gitAddCommand);
+  const gitAdd = spawn(...gitAddCommand);
+
+  let gitAddOutput = "";
+  gitAdd.stdout.on("data", function (data) {
+    gitAddOutput += data;
+  });
+  gitAdd.stderr.pipe(process.stderr);
+
+  gitAdd.on("close", function () {
+    console.log("");
+    if (gitAddOutput === "") {
+      console.log("# Nothing new to commit");
+    } else {
+      console.log("# Commit new maps");
+      const gitCommitCommand: Command = ["git", ["commit", "-m", "[recurring] Update maps"]];
+      printCommand(gitCommitCommand);
+      spawn(...gitCommitCommand, { stdio: "inherit" });
+    }
+  });
+};
 const main = async () => {
-  console.time("Maps updated");
+  console.time("Maps fetched");
 
   const r6Api = new R6Api();
   const maps = await fetchMapsList(r6Api);
   await updateMaps(r6Api, maps);
   r6Api.close();
 
-  console.timeEnd("Maps updated");
+  console.timeEnd("Maps fetched");
 
-  exec("git add data");
-  exec('git commit -m"[recurring] Update maps"');
+  createGitCommit();
 };
 
 main();
