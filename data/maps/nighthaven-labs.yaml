@@ -1,0 +1,15 @@
+id: nighthaven-labs
+name: Nighthaven Labs
+blueprints:
+  - name: Basement
+    url: >-
+      https://staticctf.akamaized.net/J3yJr34U2pZ2Ieem48Dwy9uqj5PNUQTn/79cZrFmYWuCtDCJwtLKvFn/a8ed21b415840882f77761360ce53b96/r6-maps-nighthavenlabs-blueprint-1.jpg
+  - name: 1st Floor
+    url: >-
+      https://staticctf.akamaized.net/J3yJr34U2pZ2Ieem48Dwy9uqj5PNUQTn/66qd9bxgAePlWPj9kgzGvg/d5676fc1d523c632d176afbac9d626ab/r6-maps-nighthavenlabs-blueprint-2.jpg
+  - name: 2nd Floor
+    url: >-
+      https://staticctf.akamaized.net/J3yJr34U2pZ2Ieem48Dwy9uqj5PNUQTn/31Y9aEgTpzdsVKP24E79JV/3e528af1f086ea0636287e7736567c5b/r6-maps-nighthavenlabs-blueprint-3.jpg
+  - name: Roof
+    url: >-
+      https://staticctf.akamaized.net/J3yJr34U2pZ2Ieem48Dwy9uqj5PNUQTn/6pVV3IwBrEkwtzyoeD1C5K/ab0fc218242ce0954d17ac2ddb8d80f2/r6-maps-nighthavenlabs-blueprint-4-thumb.jpg
