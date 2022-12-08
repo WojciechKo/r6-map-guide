@@ -1,26 +1,13 @@
-import puppeteer, { Browser } from "puppeteer";
+import Bottleneck from "bottleneck";
+import { exec } from "child_process";
+import { promises as fs } from "fs";
 import yaml from "js-yaml";
-import fs from "fs";
-import PromisePool from "@supercharge/promise-pool";
+import { Listr } from "listr2";
+import puppeteer, { Browser } from "puppeteer";
 
-const toTitleCase = (phrase: string) =>
-  phrase
-    .trim()
-    .toLowerCase()
-    .split(" ")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
-
-const fetchMapsUrls = async (browser: Browser) => {
-  const page = await browser.newPage();
-  await page.goto("https://www.ubisoft.com/en-us/game/rainbow-six/siege/game-info/maps", {
-    waitUntil: "networkidle0",
-  });
-
-  await page.click(".privacy__modal__accept");
-
-  const urls = page.$$eval(".maplist__cards__wrapper a[href]", (elements) => elements.map((el) => el.href));
-  return urls;
+type MapUrl = {
+  id: string;
+  url: string;
 };
 
 type MapData = {
@@ -29,69 +16,147 @@ type MapData = {
   blueprints: { name: string; url: string }[];
 };
 
-const fetchMapData = async (browser: Browser, url: string): Promise<MapData> => {
-  const id = url.split("/").at(-1);
+class R6Api {
+  #browser: Browser | undefined;
 
-  if (typeof id === "undefined") {
-    throw Error(`Map id not found url=${url}`);
-  }
+  fetchAvailableMaps = async (): Promise<MapUrl[]> => {
+    const url = "https://www.ubisoft.com/en-us/game/rainbow-six/siege/game-info/maps";
+    const page = await this.#gotoPage(url);
 
-  console.log(`MapFetching - ${id}`);
-  console.time(`MapFetching - ${id}`);
+    await page.click(".privacy__modal__accept");
 
-  const mapPage = await browser.newPage();
-  await mapPage.goto(url, { waitUntil: "networkidle0" });
+    const urls = await page.$$eval(".maplist__cards__wrapper a[href]", (elements) => elements.map((el) => el.href));
 
-  const titleContent = await mapPage.$eval(".map-details__info__title", (el) => el.textContent);
-  if (!titleContent) {
-    throw Error(`Map title not found url=${url}`);
-  }
-  const name = toTitleCase(titleContent);
+    const maps = urls.map((url) => {
+      const id = url.split("/").at(-1);
+      if (typeof id === "undefined") {
+        throw Error(`Map id not found url=${url}`);
+      }
+      return { id, url };
+    });
 
-  const blueprintsNames = await mapPage
-    .$$eval(".map-details__gallery .gallery__item span", (elements) => elements.map((el) => el.textContent))
-    .then((names) => names.filter((m): m is string => typeof m == "string").map(toTitleCase));
+    return maps;
+  };
 
-  await mapPage.click(".map-details__gallery .gallery__item img");
-  // await mapPage.waitForSelector('.react-images__dialog')
+  fetchMapData = async (map: MapUrl): Promise<MapData> => {
+    const mapPage = await this.#gotoPage(map.url);
 
-  const blueprintUrls = await mapPage.$$eval(".react-images__view > img", (elements) => elements.map((el) => el.src));
-  const blueprints = blueprintsNames.map((name, index) => ({
-    name,
-    url: blueprintUrls[index],
-  }));
+    const titleContent = await mapPage.$eval(".map-details__info__title", (el) => el.textContent);
+    if (!titleContent) {
+      throw Error(`Map title not found url=${map.url}`);
+    }
+    const name = R6Api.#toTitleCase(titleContent);
 
-  await mapPage.close();
+    const blueprintsNames = await mapPage
+      .$$eval(".map-details__gallery .gallery__item span", (elements) => elements.map((el) => el.textContent))
+      .then((names) => names.filter((m): m is string => typeof m == "string").map(R6Api.#toTitleCase));
 
-  console.timeEnd(`MapFetching - ${id}`);
+    await mapPage.click(".map-details__gallery .gallery__item img");
 
-  return { id, name, blueprints };
+    const blueprintUrls = await mapPage.$$eval(".react-images__view > img", (elements) => elements.map((el) => el.src));
+    const blueprints = blueprintsNames.map((name, index) => ({
+      name,
+      url: blueprintUrls[index],
+    }));
+
+    await mapPage.close();
+
+    return { id: map.id, name, blueprints };
+  };
+
+  close = () => this.#getBrowser().then((b) => b.close());
+
+  #gotoPage = async (url: string) => {
+    const browser = await this.#getBrowser();
+    const page = await browser.newPage();
+    await page.goto(url, { waitUntil: "networkidle0" });
+    return page;
+  };
+
+  #getBrowser = async () => {
+    if (this.#browser) {
+      return this.#browser;
+    }
+    this.#browser = await puppeteer.launch({ headless: true });
+    return this.#browser;
+  };
+
+  static #toTitleCase = (phrase: string) =>
+    phrase
+      .trim()
+      .toLowerCase()
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+}
+
+const fetchMapsList = async (r6Api: R6Api): Promise<MapUrl[]> => {
+  const { maps } = await new Listr<{ maps: MapUrl[] }>([
+    {
+      title: "Fetch maps list",
+      task: async (ctx) => {
+        ctx.maps = await r6Api.fetchAvailableMaps();
+      },
+    },
+  ]).run();
+  return maps;
 };
 
-const writeToFile = (mapData: MapData) => {
-  try {
+const updateMaps = async (r6Api: R6Api, maps: MapUrl[]) => {
+  const limiter = new Bottleneck({ maxConcurrent: 8, minTime: 1000 });
+
+  const writeToFile = (mapData: MapData) => {
     const filename = `data/maps/${mapData.id}.yaml`;
-    fs.writeFileSync(filename, yaml.dump(mapData));
+    return fs.writeFile(filename, yaml.dump(mapData));
+  };
 
-    console.log(`MapSaved - ${filename}`);
-  } catch (e) {
-    console.log(e);
-  }
+  const buildFetchMapTask = async (map: MapUrl, setTitle: (title?: string) => void) => {
+    let startAt: number;
+    const mapData = await limiter.schedule(async () => {
+      startAt = performance.now();
+      setTitle(`Fetching...`);
+      return r6Api.fetchMapData(map);
+    });
+
+    setTitle(`Storing...`);
+    await writeToFile(mapData);
+
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const elapsed = (performance.now() - startAt!) / 1000;
+    setTitle(`${elapsed.toFixed(2)}s`);
+  };
+
+  await new Listr(
+    [
+      {
+        title: `Fetch maps data`,
+        task: (_, mainTask) =>
+          mainTask.newListr(
+            maps.map((map) => ({
+              title: map.id,
+              task: (_, task) =>
+                buildFetchMapTask(map, (subtitle) => (task.title = subtitle ? `${map.id}: ${subtitle}` : map.id)),
+            })),
+            { concurrent: true }
+          ),
+      },
+    ],
+    { rendererOptions: { collapse: false } }
+  ).run();
 };
 
-(async () => {
-  console.log("Fetching maps...");
-  console.time("Fetching maps...");
+const main = async () => {
+  console.time("Maps updated");
 
-  const browser = await puppeteer.launch({ headless: true });
+  const r6Api = new R6Api();
+  const maps = await fetchMapsList(r6Api);
+  await updateMaps(r6Api, maps);
+  r6Api.close();
 
-  const mapsUrls = await fetchMapsUrls(browser);
+  console.timeEnd("Maps updated");
 
-  await PromisePool.withConcurrency(6)
-    .for(mapsUrls)
-    .process((url) => fetchMapData(browser, url).then(writeToFile));
+  exec("git add data");
+  exec('git commit -m"[recurring] Update maps"');
+};
 
-  await browser.close();
-
-  console.timeEnd("Fetching maps...");
-})();
+main();
