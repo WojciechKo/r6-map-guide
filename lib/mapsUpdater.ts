@@ -81,16 +81,17 @@ const writeToFile = (mapData: MapData) => {
 
 (async () => {
   console.log("Fetching maps...");
+  console.time("Fetching maps...");
 
   const browser = await puppeteer.launch({ headless: true });
 
   const mapsUrls = await fetchMapsUrls(browser);
 
-  await PromisePool.withConcurrency(8)
+  await PromisePool.withConcurrency(6)
     .for(mapsUrls)
     .process((url) => fetchMapData(browser, url).then(writeToFile));
 
   await browser.close();
 
-  console.log("Done!");
+  console.timeEnd("Fetching maps...");
 })();
