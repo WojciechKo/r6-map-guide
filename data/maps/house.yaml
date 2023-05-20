@@ -1,4 +1,4 @@
-id: house
+slug: house
 name: House
 blueprints:
   - name: Basement

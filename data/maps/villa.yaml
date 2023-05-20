@@ -1,4 +1,4 @@
-id: villa
+slug: villa
 name: Villa
 blueprints:
   - name: Basement

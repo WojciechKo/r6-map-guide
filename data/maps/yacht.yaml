@@ -1,4 +1,4 @@
-id: yacht
+slug: yacht
 name: Yacht
 blueprints:
   - name: Basement

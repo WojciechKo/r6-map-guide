@@ -1,4 +1,4 @@
-id: stadium
+slug: stadium
 name: Stadium
 blueprints:
   - name: Ground

@@ -1,25 +1,26 @@
-import AppBar from "@material-ui/core/AppBar";
-import Toolbar from "@material-ui/core/Toolbar";
+import MuiAppBar from "@mui/material/AppBar";
+import { styled } from "@mui/material/styles";
+import MuiToolbar from "@mui/material/Toolbar";
 import React from "react";
-import styled from "styled-components";
-import MapSelector from "./MapSelector";
-import GridSelector from "./GridSelector";
+
+import GridSelector from "@/components/GridSelector";
+import MapSelector from "@/components/MapSelector";
 import Settings from "./Settings";
 
-const StyledToolbar = styled(Toolbar)`
-  justify-content: space-between;
-`;
-
-export default () => {
+const AppBar = () => {
   return (
-    <AppBar position="static" color="primary">
-      <StyledToolbar>
+    <MuiAppBar position="static" color="primary">
+      <Toolbar>
         <MapSelector />
-
         <GridSelector />
-
         <Settings />
-      </StyledToolbar>
-    </AppBar>
+      </Toolbar>
+    </MuiAppBar>
   );
 };
+
+const Toolbar = styled(MuiToolbar)({
+  justifyContent: "space-between",
+});
+
+export default AppBar;

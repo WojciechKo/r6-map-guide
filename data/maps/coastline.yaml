@@ -1,4 +1,4 @@
-id: coastline
+slug: coastline
 name: Coastline
 blueprints:
   - name: 1st Floor

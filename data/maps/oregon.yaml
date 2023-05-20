@@ -1,4 +1,4 @@
-id: oregon
+slug: oregon
 name: Oregon
 blueprints:
   - name: Basement

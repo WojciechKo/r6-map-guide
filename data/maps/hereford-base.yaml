@@ -1,4 +1,4 @@
-id: hereford-base
+slug: hereford-base
 name: Hereford Base
 blueprints:
   - name: Basement

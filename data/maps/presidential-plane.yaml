@@ -1,4 +1,4 @@
-id: presidential-plane
+slug: presidential-plane
 name: Presidential Plane
 blueprints:
   - name: 1st Floor

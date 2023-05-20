@@ -1,4 +1,4 @@
-id: fortress
+slug: fortress
 name: Fortress
 blueprints:
   - name: 1st Floor

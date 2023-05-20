@@ -1,4 +1,4 @@
-id: favela
+slug: favela
 name: Favela
 blueprints:
   - name: Basement

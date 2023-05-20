@@ -1,4 +1,4 @@
-id: tower
+slug: tower
 name: Tower
 blueprints:
   - name: 1st Floor

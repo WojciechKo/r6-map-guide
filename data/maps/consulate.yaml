@@ -1,4 +1,4 @@
-id: consulate
+slug: consulate
 name: Consulate
 blueprints:
   - name: Basement

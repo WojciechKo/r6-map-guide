@@ -1,4 +1,4 @@
-id: theme-park
+slug: theme-park
 name: Theme Park
 blueprints:
   - name: 1st Floor

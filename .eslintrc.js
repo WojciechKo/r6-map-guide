@@ -7,6 +7,7 @@ module.exports = {
   extends: [
     "eslint:recommended",
     "plugin:react/recommended",
+    "plugin:react-hooks/recommended",
     "plugin:@typescript-eslint/recommended",
   ],
   parser: "@typescript-eslint/parser",
@@ -18,5 +19,9 @@ module.exports = {
     sourceType: "module",
   },
   plugins: ["react", "@typescript-eslint"],
-  rules: {},
+  rules: {
+    "react/display-name": "off",
+    "no-console": "error",
+    "@typescript-eslint/no-non-null-assertion": "off",
+  },
 };

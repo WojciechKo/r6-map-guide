@@ -1,4 +1,4 @@
-id: border
+slug: border
 name: Border
 blueprints:
   - name: Ground

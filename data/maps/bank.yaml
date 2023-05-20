@@ -1,4 +1,4 @@
-id: bank
+slug: bank
 name: Bank
 blueprints:
   - name: Basement

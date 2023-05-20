@@ -1,4 +1,4 @@
-id: clubhouse
+slug: clubhouse
 name: Clubhouse
 blueprints:
   - name: Basement

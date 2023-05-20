@@ -4,7 +4,7 @@
 
 To fetch maps data and save them in `/data/maps/*.yaml` files execute:
 
-    npm run updateMaps
+    npm run update-maps-data
 
 ### **Development**
 

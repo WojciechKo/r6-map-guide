@@ -1,4 +1,4 @@
-id: kanal
+slug: kanal
 name: Kanal
 blueprints:
   - name: Ground

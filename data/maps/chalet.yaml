@@ -1,4 +1,4 @@
-id: chalet
+slug: chalet
 name: Chalet
 blueprints:
   - name: Basement

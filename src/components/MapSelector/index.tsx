@@ -1,13 +1,12 @@
+import { useMaps } from "@/contexts/MapsContext";
 import { navigate } from "gatsby";
-import React, { useContext, useState } from "react";
-import { MapsContext, SelectedMapContext } from "../../../contexts/MapsContext";
+import React, { FC, useState } from "react";
+
 import MapSelectorButton from "./MapSelectorButton";
 import MapSelectorMenu from "./MapSelectorMenu";
 
-const MapSelector = () => {
-  const maps = useContext(MapsContext);
-  const selectedMapId = useContext(SelectedMapContext);
-  const selectedMap = maps.find((map) => map.id === selectedMapId);
+const MapSelector: FC = () => {
+  const { selectedMap } = useMaps();
 
   const [isMenuOpen, setMenuOpen] = useState(false);
   const anchorRef = React.useRef<HTMLButtonElement>(null);
@@ -25,27 +24,27 @@ const MapSelector = () => {
     setMenuOpen((prevOpen) => !prevOpen);
   };
 
-  const onClickAway = (event: React.MouseEvent<EventTarget>) => {
-    if (
-      !isMenuOpen ||
-      anchorRef.current?.contains(event.target as HTMLElement)
-    ) {
+  const onClickAway = (event: MouseEvent | TouchEvent) => {
+    console.log("onClickAway")
+    event.preventDefault();
+    return 
+    if (!isMenuOpen || anchorRef.current?.contains(event.target as HTMLElement)) {
       return;
     }
 
     setMenuOpen(false);
   };
 
-  const onMapSelected = (mapId) => {
+  const onMapSelected = (mapSlug: string) => {
     setMenuOpen(false);
-    navigate(`/maps/${mapId}`);
+    navigate(`/maps/${mapSlug}`);
   };
 
   return (
     <div>
       <MapSelectorButton
         ref={anchorRef}
-        text={selectedMap?.name}
+        text={selectedMap?.name ?? ""}
         isMenuOpen={isMenuOpen}
         onClick={handleButtonClick}
       />
@@ -53,8 +52,6 @@ const MapSelector = () => {
       <MapSelectorMenu
         anchorEl={anchorRef.current}
         isMenuOpen={isMenuOpen}
-        maps={maps}
-        selectedMapId={selectedMapId}
         onClickAway={onClickAway}
         onMapSelected={onMapSelected}
       />

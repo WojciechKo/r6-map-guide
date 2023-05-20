@@ -1,98 +1,74 @@
-import CssBaseline from "@material-ui/core/CssBaseline";
-import { ThemeProvider as MuiThemeProvider } from "@material-ui/core/styles";
+import { MapViewerGridProvider } from "@/contexts/MapViewerGridContext";
+import theme from "@/theme";
+import { GlobalStyles } from "@mui/material";
+import CssBaseline from "@mui/material/CssBaseline";
+import { styled, ThemeProvider as MuiThemeProvider } from "@mui/material/styles";
 import { graphql, useStaticQuery } from "gatsby";
-import React from "react";
+import React, { FC, PropsWithChildren } from "react";
 import { Helmet } from "react-helmet";
-import styled, { createGlobalStyle, ThemeProvider } from "styled-components";
-import { GridContextProvider } from "../contexts/GridContext";
-import { MapsContext } from "../contexts/MapsContext";
+
 import AppBar from "./AppBar";
-import theme from "./theme";
 
-const GlobalStyle = createGlobalStyle`
-  a, a:hover, a:focus, a:active {
-    text-decoration: none;
-    color: inherit;
-  }
-`;
-
-const Container = styled.div`
-  height: 100%;
-  width: 100%;
-  position: fixed;
-  display: flex;
-  flex-flow: column nowrap;
-`;
-
-const Page = styled.main`
-  overflow: hidden;
-  flex: 1 1;
-`;
-
-const Layout = ({ children }) => {
-  const data = useStaticQuery(graphql`
-    query {
+const Layout: FC<PropsWithChildren> = ({ children }) => {
+  const data = useStaticQuery<Queries.LayoutDataQuery>(graphql`
+    query LayoutData {
       site {
         siteMetadata {
           title
         }
       }
-      allMapsYaml(sort: { fields: name, order: ASC }) {
-        nodes {
-          parent {
-            ... on File {
-              id
-              name
-            }
-          }
-          name
-        }
-      }
     }
   `);
 
-  const maps = data.allMapsYaml.nodes.map((mapData) => ({
-    name: mapData.name,
-    id: mapData.parent.name,
-  }));
-
   return (
     <MuiThemeProvider theme={theme}>
-      <ThemeProvider theme={theme}>
-        <MapsContext.Provider value={maps}>
-          <GridContextProvider>
-            <CssBaseline />
-            <GlobalStyle />
+      <CssBaseline />
+      <GlobalStyles
+        styles={{
+          "a, a:hover, a:focus, a:active": {
+            textDecoration: "none",
+            color: "inherit",
+          },
+        }}
+      />
 
-            <Helmet>
-              <meta charSet="utf-8" />
-              <title>{data.site.siteMetadata.title}</title>
+      <Head title={data.site!.siteMetadata!.title ?? ""} />
+      <Main>
+        <MapViewerGridProvider>
+          <AppBar />
 
-              <meta
-                name="viewport"
-                content="minimum-scale=1, initial-scale=1, width=device-width"
-              />
-
-              <link
-                rel="stylesheet"
-                href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
-              />
-              <link
-                rel="stylesheet"
-                href="https://fonts.googleapis.com/icon?family=Material+Icons"
-              />
-            </Helmet>
-
-            <Container>
-              <AppBar />
-
-              <Page>{children}</Page>
-            </Container>
-          </GridContextProvider>
-        </MapsContext.Provider>
-      </ThemeProvider>
+          <Page>{children}</Page>
+        </MapViewerGridProvider>
+      </Main>
     </MuiThemeProvider>
   );
 };
+
+const Head: FC<{ title: string }> = ({ title }) => {
+  return (
+    <Helmet>
+      <meta charSet="utf-8" />
+      <title>{title}</title>
+
+      <meta name="viewport" content="minimum-scale=1, initial-scale=1, width=device-width" />
+
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
+      <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+    </Helmet>
+  );
+};
+
+const Main = styled("div")({
+  height: "100%",
+  width: "100%",
+  position: "fixed",
+  display: "flex",
+  flexFlow: "column nowrap",
+});
+
+const Page = styled("main")({
+  overflow: "hidden",
+  flex: "1 1",
+});
 
 export default Layout;

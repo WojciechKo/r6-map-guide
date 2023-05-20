@@ -1,144 +1,129 @@
-import { useReducer } from "react";
+import { ImmerReducer, useImmerReducer } from "use-immer";
 
-export function blueprintReducer(state, action) {
+const blueprintViewerReducer: ImmerReducer<State, Action> = (draft, action) => {
   switch (action.type) {
     case "move-blueprint": {
-      const newPro = {
-        ...state,
-        blueprintMove: {
-          x: action.payload.position.x,
-          y: action.payload.position.y,
-        },
-      };
-
-      return newPro;
+      draft.blueprintMove.x = action.payload.x;
+      draft.blueprintMove.y = action.payload.y;
+      break;
     }
 
     case "zoom-blueprint": {
       const scaleJump = 1.1;
-      const scale = action.payload.scale < 0
-        ? Math.min(5, state.blueprintScale.scale * scaleJump)
-        : Math.max(0.1, state.blueprintScale.scale / scaleJump);
+      const scale =
+        action.payload.scale < 0
+          ? Math.min(5, draft.blueprintScale.scale * scaleJump)
+          : Math.max(0.1, draft.blueprintScale.scale / scaleJump);
 
-      const scaleRatio = scale / state.blueprintScale.scale;
+      const scaleRatio = scale / draft.blueprintScale.scale;
 
       if (scaleRatio === 1) {
-        return state;
+        break;
       }
 
       const x =
         action.payload.focusPoint.x -
-        state.blueprintMove.x -
-        scaleRatio *
-          (action.payload.focusPoint.x -
-            state.blueprintMove.x -
-            state.blueprintScale.x);
+        draft.blueprintMove.x -
+        scaleRatio * (action.payload.focusPoint.x - draft.blueprintMove.x - draft.blueprintScale.x);
       const y =
         action.payload.focusPoint.y -
-        state.blueprintMove.y -
-        scaleRatio *
-          (action.payload.focusPoint.y -
-            state.blueprintMove.y -
-            state.blueprintScale.y);
+        draft.blueprintMove.y -
+        scaleRatio * (action.payload.focusPoint.y - draft.blueprintMove.y - draft.blueprintScale.y);
 
-      return {
-        ...state,
-        blueprintScale: { x, y, scale },
-      };
+      draft.blueprintScale = { x, y, scale };
+      break;
     }
 
     case "zoom-blueprint2": {
-      const scale = action.payload.scale > 0
-        ? Math.min(5, state.blueprintScale.scale + action.payload.scale)
-        : Math.max(0.1, state.blueprintScale.scale + action.payload.scale);
+      const scale =
+        action.payload.scale > 0
+          ? Math.min(5, draft.blueprintScale.scale + action.payload.scale)
+          : Math.max(0.1, draft.blueprintScale.scale + action.payload.scale);
 
-        console.log(scale);
-      const scaleRatio = scale / state.blueprintScale.scale;
+      const scaleRatio = scale / draft.blueprintScale.scale;
 
       if (scaleRatio === 1) {
-        return state;
+        break;
       }
 
       const x =
         action.payload.focusPoint.x -
-        state.blueprintMove.x -
-        scaleRatio *
-          (action.payload.focusPoint.x -
-            state.blueprintMove.x -
-            state.blueprintScale.x);
+        draft.blueprintMove.x -
+        scaleRatio * (action.payload.focusPoint.x - draft.blueprintMove.x - draft.blueprintScale.x);
       const y =
         action.payload.focusPoint.y -
-        state.blueprintMove.y -
-        scaleRatio *
-          (action.payload.focusPoint.y -
-            state.blueprintMove.y -
-            state.blueprintScale.y);
+        draft.blueprintMove.y -
+        scaleRatio * (action.payload.focusPoint.y - draft.blueprintMove.y - draft.blueprintScale.y);
 
-      return {
-        ...state,
-        blueprintScale: { x, y, scale },
-      };
+      draft.blueprintScale = { x, y, scale };
+      break;
     }
     case "place-marker": {
-      const x =
-        (action.payload.position.x -
-          state.blueprintMove.x -
-          state.blueprintScale.x) /
-        state.blueprintScale.scale;
-      const y =
-        (action.payload.position.y -
-          state.blueprintMove.y -
-          state.blueprintScale.y) /
-        state.blueprintScale.scale;
+      const x = (action.payload.x - draft.blueprintMove.x - draft.blueprintScale.x) / draft.blueprintScale.scale;
+      const y = (action.payload.y - draft.blueprintMove.y - draft.blueprintScale.y) / draft.blueprintScale.scale;
 
       if (x < 0 || y < 0) {
-        return state;
+        break;
       }
 
-      return {
-        ...state,
-        markerPosition: { x, y },
-      };
+      draft.markerPosition = { x, y };
+      break;
     }
-    default:
-      return state;
   }
-}
+};
 
-export function useBlueprintReducer() {
-  const [blueprintState, blueprintDispatch] = useReducer(blueprintReducer, {
-    markerPosition: { x: undefined, y: undefined },
+export const useBlueprintViewer = () => {
+  const [blueprintState, viewerDispatch] = useImmerReducer(blueprintViewerReducer, {
+    markerPosition: undefined,
     blueprintMove: { x: 0, y: 0 },
     blueprintScale: { x: 0, y: 0, scale: 1 },
   });
 
-  return [
-    blueprintState,
-    {
-      moveBlueprint: (position) => {
-        blueprintDispatch({
-          type: "move-blueprint",
-          payload: { position },
-        });
-      },
-      zoomBlueprint: (payload) => {
-        blueprintDispatch({
-          type: "zoom-blueprint",
-          payload: payload,
-        });
-      },
-      zoomBlueprint2: (payload) => {
-        blueprintDispatch({
-          type: "zoom-blueprint2",
-          payload: payload,
-        });
-      },
-      placeMarker: (position) => {
-        blueprintDispatch({
-          type: "place-marker",
-          payload: { position },
-        });
-      },
-    },
-  ];
-}
+  return { ...blueprintState, viewerDispatch };
+};
+
+type State = {
+  blueprintScale: { scale: number; x: number; y: number };
+  blueprintMove: { x: number; y: number };
+  markerPosition?: { x: number; y: number };
+};
+
+type Action = MoveBlueprintAction | ZoomBlueprintAction | ZoomBlueprint2Action | PlaceMarkerAction;
+
+type MoveBlueprintAction = {
+  type: "move-blueprint";
+  payload: {
+    x: number;
+    y: number;
+  };
+};
+
+type ZoomBlueprintAction = {
+  type: "zoom-blueprint";
+  payload: {
+    scale: number;
+    focusPoint: {
+      x: number;
+      y: number;
+    };
+  };
+};
+
+type ZoomBlueprint2Action = {
+  type: "zoom-blueprint2";
+  payload: {
+    scale: number;
+    focusPoint: {
+      x: number;
+      y: number;
+    };
+  };
+};
+
+type PlaceMarkerAction = {
+  type: "place-marker";
+  payload: {
+    x: number;
+    y: number;
+  };
+};

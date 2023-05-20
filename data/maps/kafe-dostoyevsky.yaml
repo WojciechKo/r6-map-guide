@@ -1,4 +1,4 @@
-id: kafe-dostoyevsky
+slug: kafe-dostoyevsky
 name: Kafe Dostoyevsky
 blueprints:
   - name: Basement

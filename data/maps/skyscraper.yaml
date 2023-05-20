@@ -1,4 +1,4 @@
-id: skyscraper
+slug: skyscraper
 name: Skyscraper
 blueprints:
   - name: 1st Floor
