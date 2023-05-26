@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import puppeteer, { Browser, Page, TimeoutError } from "puppeteer";
+import { Browser, chromium, errors, Page } from "playwright";
 
 export type MapId = {
   slug: string;
@@ -11,6 +11,115 @@ export type MapData = Pick<MapId, "slug"> & {
   blueprints: { name: string; url: string }[];
 };
 
+export class R6Api {
+  #browser: Browser | undefined;
+
+  fetchMapsList = async (): Promise<MapId[]> => {
+    return this.#retryOnTimeout(this.#fetchMapsList);
+  };
+
+  fetchMapData = async (map: MapId): Promise<MapData> => {
+    return this.#retryOnTimeout(() => this.#fetchMapData(map));
+  };
+
+  #fetchMapsList = async (): Promise<MapId[]> => {
+    const url = "https://www.ubisoft.com/en-us/game/rainbow-six/siege/game-info/maps";
+
+    return this.#withLoadedPage(url, async (page) => {
+      await page.click(".privacy__modal__accept");
+
+      const urls = await page
+        .locator(".maplist__cards__wrapper a[href]")
+        .evaluateAll((anchors: HTMLAnchorElement[]) => anchors.map((a) => a.href));
+
+      const maps = urls.map((url) => ({ url, slug: this.#extractSlug(url) }));
+
+      return maps;
+    });
+  };
+
+  #fetchMapData = async (map: MapId): Promise<MapData> => {
+    return this.#withLoadedPage(map.url, async (mapPage) => {
+      const titleContent = await mapPage.locator(".map-details__info__title").textContent();
+      if (!titleContent) {
+        throw Error(`Map title not found url=${map.url}`);
+      }
+      const name = toTitleCase(titleContent);
+
+      const blueprintsNames = await mapPage
+        .locator(".map-details__gallery .gallery__item span")
+        .allTextContents()
+        .then((names) => names.map(toTitleCase));
+
+      await mapPage.click(".map-details__gallery .gallery__item img");
+
+      const blueprintUrls = await mapPage
+        .locator(".react-images__view > img")
+        .all()
+        .then((images) => Promise.all(images.map(async (image) => (await image.getAttribute("src")) || "")));
+
+      const blueprints = blueprintsNames.map((name, index) => ({
+        name,
+        url: blueprintUrls[index],
+      }));
+
+      return { slug: map.slug, name, blueprints };
+    });
+  };
+
+  close = async (): Promise<void> => {
+    if (this.#browser) {
+      await this.#browser.close();
+      this.#browser = undefined;
+    }
+  };
+
+  #retryOnTimeout = async <T>(fun: () => Promise<T>): Promise<T> => {
+    try {
+      return await fun();
+    } catch (error) {
+      if (error instanceof errors.TimeoutError) {
+        return this.#retryOnTimeout(fun);
+      }
+      throw error;
+    }
+  };
+
+  #extractSlug = (url: string): string => {
+    const slug = url.split("/").at(-1);
+    if (typeof slug === "undefined") {
+      throw Error(`Map slug not found url=${url}`);
+    }
+    return slug;
+  };
+
+  #withLoadedPage = async <T>(url: string, callback: (page: Page) => Promise<T>) => {
+    let page;
+    try {
+      page = await this.#loadPage(url);
+      return await callback(page);
+    } finally {
+      await page?.close();
+    }
+  };
+
+  #loadPage = async (url: string): Promise<Page> => {
+    if (!this.#browser) {
+      this.#browser = await chromium.launch({ headless: false, logger: undefined });
+      await this.#browser.newContext();
+    }
+    const page = await this.#browser.contexts()[0].newPage();
+    try {
+      page.setDefaultTimeout(5000);
+      await page.goto(url);
+      await page.waitForLoadState("networkidle");
+      return page;
+    } catch {
+      return page;
+    }
+  };
+}
+
 const toTitleCase = (phrase: string) => {
   return phrase
     .trim()
@@ -19,130 +128,3 @@ const toTitleCase = (phrase: string) => {
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
 };
-
-export class R6Api {
-  #browser: Browser | undefined;
-
-  fetchMapsList = async (): Promise<MapId[]> => {
-    const url = "https://www.ubisoft.com/en-us/game/rainbow-six/siege/game-info/maps";
-    const page = await this.#openNewPage(url);
-
-    await page.click(".privacy__modal__accept");
-
-    const urls = await page.$$eval(".maplist__cards__wrapper a[href]", (elements) => elements.map((el) => el.href));
-    const maps = urls.map(this.#buildMapPage);
-
-    await page.close();
-
-    return maps;
-  };
-
-  fetchMapData = async (map: MapId): Promise<MapData> => {
-    let mapPage;
-    try {
-      mapPage = await this.#openNewPage(map.url);
-
-      const titleContent = await mapPage.$eval(".map-details__info__title", (el) => el.textContent);
-      if (!titleContent) {
-        throw Error(`Map title not found url=${map.url}`);
-      }
-      const name = toTitleCase(titleContent);
-
-      const blueprintsNames = await mapPage
-        .$$eval(".map-details__gallery .gallery__item span", (elements) => elements.map((el) => el.textContent))
-        .then((names) => names.filter((m): m is string => typeof m == "string").map(toTitleCase));
-
-      await mapPage.click(".map-details__gallery .gallery__item img");
-
-      const blueprintUrls = await mapPage.$$eval(".react-images__view > img", (elements) =>
-        elements.map((el) => el.src)
-      );
-      const blueprints = blueprintsNames.map((name, index) => ({
-        name,
-        url: blueprintUrls[index],
-      }));
-
-      return { slug: map.slug, name, blueprints };
-    } catch (e) {
-      if (e instanceof TimeoutError) {
-        return this.fetchMapData(map);
-      }
-      throw e;
-    } finally {
-      await mapPage?.close();
-    }
-  };
-
-  retryOnTimeout = async (fun: () => Promise<any>) => {
-    try {
-      return fun();
-    } catch (e) {
-      if (e instanceof TimeoutError) {
-        console.log("TIMEOUT");
-        return fun();
-      }
-      throw e;
-    }
-  };
-
-  fetchMapData2 = async (map: MapId): Promise<MapData> => {
-    return this.retryOnTimeout(async () => {
-      let mapPage;
-      try {
-        mapPage = await this.#openNewPage(map.url);
-
-        const titleContent = await mapPage.$eval(".map-details__info__title", (el) => el.textContent);
-        if (!titleContent) {
-          throw Error(`Map title not found url=${map.url}`);
-        }
-        const name = toTitleCase(titleContent);
-
-        const blueprintsNames = await mapPage
-          .$$eval(".map-details__gallery .gallery__item span", (elements) => elements.map((el) => el.textContent))
-          .then((names) => names.filter((m): m is string => typeof m == "string").map(toTitleCase));
-
-        await mapPage.click(".map-details__gallery .gallery__item img");
-
-        const blueprintUrls = await mapPage.$$eval(".react-images__view > img", (elements) =>
-          elements.map((el) => el.src)
-        );
-        const blueprints = blueprintsNames.map((name, index) => ({
-          name,
-          url: blueprintUrls[index],
-        }));
-
-        return { slug: map.slug, name, blueprints };
-      } finally {
-        await mapPage?.close();
-      }
-    });
-  };
-
-  close = async (): Promise<void> => {
-    return this.#getBrowser().then((b) => b.close());
-  };
-
-  #buildMapPage = (url: string): MapId => {
-    const slug = url.split("/").at(-1);
-    if (typeof slug === "undefined") {
-      throw Error(`Map slug not found url=${url}`);
-    }
-    return { slug, url };
-  };
-
-  #openNewPage = async (url: string): Promise<Page> => {
-    const browser = await this.#getBrowser();
-    const page = await browser.newPage();
-    page.setDefaultTimeout(3000);
-    await page.goto(url, { waitUntil: "networkidle0" });
-    return page;
-  };
-
-  #getBrowser = async (): Promise<Browser> => {
-    if (this.#browser) {
-      return this.#browser;
-    }
-    this.#browser = await puppeteer.launch({ headless: true });
-    return this.#browser;
-  };
-}

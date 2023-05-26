@@ -14,7 +14,7 @@
     "serve": "gatsby serve",
     "clean": "gatsby clean",
     "typecheck": "tsc --noEmit",
-    "update-maps-data": "ts-node bin/mapsUpdater.ts"
+    "update-maps-data": "node -r ts-node/register bin/mapsUpdater.ts"
   },
   "//": "https://github.com/gatsbyjs/gatsby/issues/37242#issuecomment-1396620944",
   "overrides": {
@@ -44,6 +44,7 @@
     "gatsby-transformer-yaml": "^5.9.0",
     "immer": "^10.0.1",
     "listr2": "^5.0.6",
+    "playwright": "^1.34.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-helmet": "^6.1.0",

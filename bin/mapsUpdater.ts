@@ -25,7 +25,7 @@ const fetchMapsList = async (r6Api: R6Api): Promise<MapId[]> => {
 };
 
 const updateMapsData = async (r6Api: R6Api, maps: MapId[]) => {
-  const limiter = new Bottleneck({ maxConcurrent: 12, minTime: 0 });
+  const limiter = new Bottleneck({ maxConcurrent: 6, minTime: 1000 });
 
   const updateMapData = async (map: MapId, setStatus: (title: string) => void) => {
     let startAt: number;
@@ -38,7 +38,6 @@ const updateMapsData = async (r6Api: R6Api, maps: MapId[]) => {
     setStatus(`Storing...`);
     await writeToFile(mapData);
 
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const elapsed = (performance.now() - startAt!) / 1000;
     setStatus(`${elapsed.toFixed(2)}s`);
   };
