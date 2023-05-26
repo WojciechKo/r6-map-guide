@@ -32,6 +32,29 @@ const config: GatsbyConfig = {
       },
     },
     `gatsby-plugin-netlify`,
+    {
+      resolve: `gatsby-plugin-manifest`,
+      options: {
+        icon: "src/images/favicon-96.png",
+        icons: [
+          {
+            src: "src/images/favicon-96.png",
+            sizes: "96x96",
+            type: "image/png",
+          },
+          {
+            src: "src/images/favicon-32.png",
+            sizes: "32x32",
+            type: "image/png",
+          },
+          {
+            src: "src/images/favicon-16.png",
+            sizes: "16x16",
+            type: "image/png",
+          },
+        ],
+      },
+    },
   ],
 };
 
