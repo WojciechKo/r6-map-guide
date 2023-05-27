@@ -13,6 +13,7 @@ export type MapData = Pick<MapId, "slug"> & {
 
 export class R6Api {
   #browser: Browser | undefined;
+  MapsListUrl = "https://www.ubisoft.com/en-us/game/rainbow-six/siege/game-info/maps";
 
   fetchMapsList = async (): Promise<MapId[]> => {
     return this.#retryOnTimeout(this.#fetchMapsList);
@@ -23,9 +24,7 @@ export class R6Api {
   };
 
   #fetchMapsList = async (): Promise<MapId[]> => {
-    const url = "https://www.ubisoft.com/en-us/game/rainbow-six/siege/game-info/maps";
-
-    return this.#withLoadedPage(url, async (page) => {
+    return this.#withLoadedPage(this.MapsListUrl, async (page) => {
       await page.click(".privacy__modal__accept");
 
       const urls = await page
@@ -105,7 +104,7 @@ export class R6Api {
 
   #loadPage = async (url: string): Promise<Page> => {
     if (!this.#browser) {
-      this.#browser = await chromium.launch({ headless: false, logger: undefined });
+      this.#browser = await chromium.launch({ headless: true, logger: undefined });
       await this.#browser.newContext();
     }
     const page = await this.#browser.contexts()[0].newPage();
