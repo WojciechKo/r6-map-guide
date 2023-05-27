@@ -5,34 +5,36 @@ import { promises as fs } from "fs";
 import yaml from "js-yaml";
 import { Listr } from "listr2";
 
-import { MapData, MapId, R6Api } from "../lib/R6Api";
+import { close, fetchMapData, fetchMapsList } from "../lib/R6Api";
+
+import type { MapData, MapUrl } from "../lib/R6Api";
 
 const writeToFile = (mapData: MapData) => {
   const filename = `data/maps/${mapData.slug}.yaml`;
   return fs.writeFile(filename, yaml.dump(mapData));
 };
 
-const fetchMapsList = async (r6Api: R6Api): Promise<MapId[]> => {
-  const { maps } = await new Listr<{ maps: MapId[] }>([
+const fetchMapsListTask = async (): Promise<MapUrl[]> => {
+  const { maps } = await new Listr<{ maps: MapUrl[] }>([
     {
       title: "Fetch maps list",
       task: async (ctx) => {
-        ctx.maps = await r6Api.fetchMapsList();
+        ctx.maps = await fetchMapsList();
       },
     },
   ]).run();
   return maps;
 };
 
-const updateMapsData = async (r6Api: R6Api, maps: MapId[]) => {
+const updateMapsDataTask = async (maps: MapUrl[]) => {
   const limiter = new Bottleneck({ maxConcurrent: 6, minTime: 1000 });
 
-  const updateMapData = async (map: MapId, setStatus: (title: string) => void) => {
+  const updateMapData = async (map: MapUrl, setStatus: (title: string) => void) => {
     let startAt: number;
     const mapData = await limiter.schedule(async () => {
       startAt = performance.now();
       setStatus(`Fetching...`);
-      return r6Api.fetchMapData(map);
+      return fetchMapData(map);
     });
 
     setStatus(`Storing...`);
@@ -94,12 +96,10 @@ const createGitCommit = () => {
 };
 
 const main = async () => {
-  const r6Api = new R6Api();
-
   console.time("Maps fetched");
-  const maps = await fetchMapsList(r6Api);
-  await updateMapsData(r6Api, maps);
-  r6Api.close();
+  const maps = await fetchMapsListTask();
+  await updateMapsDataTask(maps);
+  close();
 
   console.timeEnd("Maps fetched");
 

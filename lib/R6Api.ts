@@ -1,123 +1,124 @@
 /* eslint-disable no-console */
 import { Browser, chromium, errors, Page } from "playwright";
 
-export type MapId = {
+export type MapUrl = {
   slug: string;
   url: string;
 };
 
-export type MapData = Pick<MapId, "slug"> & {
+export type MapData = Pick<MapUrl, "slug"> & {
   name: string;
   blueprints: { name: string; url: string }[];
 };
 
-export class R6Api {
-  #browser: Browser | undefined;
-  MapsListUrl = "https://www.ubisoft.com/en-us/game/rainbow-six/siege/game-info/maps";
+let browser: Browser | undefined;
+const MapsListUrl = "https://www.ubisoft.com/en-us/game/rainbow-six/siege/game-info/maps";
 
-  fetchMapsList = async (): Promise<MapId[]> => {
-    return this.#retryOnTimeout(this.#fetchMapsList);
-  };
+export const fetchMapsList = async (): Promise<MapUrl[]> => {
+  return retryOnTimeout(_fetchMapsList);
+};
 
-  fetchMapData = async (map: MapId): Promise<MapData> => {
-    return this.#retryOnTimeout(() => this.#fetchMapData(map));
-  };
+export const fetchMapData = async (map: MapUrl): Promise<MapData> => {
+  return retryOnTimeout(_fetchMapData.bind(this, map));
+};
 
-  #fetchMapsList = async (): Promise<MapId[]> => {
-    return this.#withLoadedPage(this.MapsListUrl, async (page) => {
-      await page.click(".privacy__modal__accept");
+export const close = async (): Promise<void> => {
+  if (browser) {
+    await browser.close();
+    browser = undefined;
+  }
+};
 
-      const urls = await page
-        .locator(".maplist__cards__wrapper a[href]")
-        .evaluateAll((anchors: HTMLAnchorElement[]) => anchors.map((a) => a.href));
+const _fetchMapsList = async (): Promise<MapUrl[]> => {
+  return withLoadedPage(MapsListUrl, async (page) => {
+    await page.click(".privacy__modal__accept");
 
-      const maps = urls.map((url) => ({ url, slug: this.#extractSlug(url) }));
+    const urls = await page
+      .locator(".maplist__cards__wrapper a[href]")
+      .evaluateAll((anchors: HTMLAnchorElement[]) => anchors.map((a) => a.href));
 
-      return maps;
-    });
-  };
+    const maps = urls.map((url) => ({
+      url,
+      slug: extractSlug(url),
+    }));
 
-  #fetchMapData = async (map: MapId): Promise<MapData> => {
-    return this.#withLoadedPage(map.url, async (mapPage) => {
-      const titleContent = await mapPage.locator(".map-details__info__title").textContent();
-      if (!titleContent) {
-        throw Error(`Map title not found url=${map.url}`);
-      }
-      const name = toTitleCase(titleContent);
+    return maps;
+  });
+};
 
-      const blueprintsNames = await mapPage
-        .locator(".map-details__gallery .gallery__item span")
-        .allTextContents()
-        .then((names) => names.map(toTitleCase));
-
-      await mapPage.click(".map-details__gallery .gallery__item img");
-
-      const blueprintUrls = await mapPage
-        .locator(".react-images__view > img")
-        .all()
-        .then((images) => Promise.all(images.map(async (image) => (await image.getAttribute("src")) || "")));
-
-      const blueprints = blueprintsNames.map((name, index) => ({
-        name,
-        url: blueprintUrls[index],
-      }));
-
-      return { slug: map.slug, name, blueprints };
-    });
-  };
-
-  close = async (): Promise<void> => {
-    if (this.#browser) {
-      await this.#browser.close();
-      this.#browser = undefined;
+const _fetchMapData = async (map: MapUrl): Promise<MapData> => {
+  return withLoadedPage(map.url, async (mapPage) => {
+    const titleContent = await mapPage.locator(".map-details__info__title").textContent();
+    if (!titleContent) {
+      throw Error(`Map title not found url=${map.url}`);
     }
-  };
+    const name = toTitleCase(titleContent);
 
-  #retryOnTimeout = async <T>(fun: () => Promise<T>): Promise<T> => {
-    try {
-      return await fun();
-    } catch (error) {
-      if (error instanceof errors.TimeoutError) {
-        return this.#retryOnTimeout(fun);
-      }
-      throw error;
-    }
-  };
+    const blueprintsNames = await mapPage
+      .locator(".map-details__gallery .gallery__item span")
+      .allTextContents()
+      .then((names) => names.map(toTitleCase));
 
-  #extractSlug = (url: string): string => {
-    const slug = url.split("/").at(-1);
-    if (typeof slug === "undefined") {
-      throw Error(`Map slug not found url=${url}`);
-    }
-    return slug;
-  };
+    await mapPage.click(".map-details__gallery .gallery__item img");
 
-  #withLoadedPage = async <T>(url: string, callback: (page: Page) => Promise<T>) => {
-    let page;
-    try {
-      page = await this.#loadPage(url);
-      return await callback(page);
-    } finally {
-      await page?.close();
-    }
-  };
+    const blueprintUrls = await mapPage
+      .locator(".react-images__view > img")
+      .all()
+      .then((images) => Promise.all(images.map(async (image) => (await image.getAttribute("src")) || "")));
 
-  #loadPage = async (url: string): Promise<Page> => {
-    if (!this.#browser) {
-      this.#browser = await chromium.launch({ headless: true, logger: undefined });
-      await this.#browser.newContext();
+    const blueprints = blueprintsNames.map((name, index) => ({
+      name,
+      url: blueprintUrls[index],
+    }));
+
+    return { slug: map.slug, name, blueprints };
+  });
+};
+
+const retryOnTimeout = async <T>(fun: () => Promise<T>): Promise<T> => {
+  try {
+    return await fun();
+  } catch (error) {
+    if (error instanceof errors.TimeoutError) {
+      return retryOnTimeout(fun);
     }
-    const page = await this.#browser.contexts()[0].newPage();
-    try {
-      page.setDefaultTimeout(5000);
-      await page.goto(url);
-      await page.waitForLoadState("networkidle");
-      return page;
-    } catch {
-      return page;
-    }
-  };
-}
+    throw error;
+  }
+};
+
+const withLoadedPage = async <T>(url: string, callback: (page: Page) => Promise<T>) => {
+  let page;
+  try {
+    page = await loadPage(url);
+    return await callback(page);
+  } finally {
+    await page?.close();
+  }
+};
+
+const loadPage = async (url: string): Promise<Page> => {
+  if (!browser) {
+    browser = await chromium.launch({ headless: true, logger: undefined });
+    await browser.newContext();
+  }
+  const page = await browser.contexts()[0].newPage();
+  try {
+    page.setDefaultTimeout(10000);
+    await page.goto(url);
+    await page.waitForLoadState("networkidle");
+    return page;
+  } catch {
+    return page;
+  }
+};
+
+const extractSlug = (url: string): string => {
+  const slug = url.split("/").at(-1);
+  if (typeof slug === "undefined") {
+    throw Error(`Map slug not found url=${url}`);
+  }
+  return slug;
+};
 
 const toTitleCase = (phrase: string) => {
   return phrase
