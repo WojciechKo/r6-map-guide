@@ -79,9 +79,17 @@ const MapViewer: FC = () => {
   }, [blueprintScaleAnimation, blueprintScale]);
 
   return (
-    <BlueprintsContainer rows={grid.rows} columns={grid.columns} {...bindDragAndPinch()}>
+    <BlueprintsContainer
+      rows={grid.rows}
+      columns={grid.columns}
+      {...bindDragAndPinch()}
+    >
       {Array.from({ length: grid.rows * grid.columns }).map((_, index) => (
-        <BlueprintFrame key={index} {...bindWheel()} {...bindTap()}>
+        <BlueprintFrame
+          key={index}
+          {...bindWheel()}
+          {...bindTap()}
+        >
           {blueprints[index] && (
             <Blueprint>
               <Mover style={blueprintMoveStyles}>
@@ -126,7 +134,7 @@ const Blueprint = styled(animated.div)({
   pointerEvents: "none",
 });
 
-const Mover = styled(animated.div)();
+const Mover = animated.div;
 
 const Zoomer = styled(animated.div)({
   transformOrigin: "top left",
