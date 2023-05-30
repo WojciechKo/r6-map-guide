@@ -3,6 +3,8 @@ import React, { FC, PropsWithChildren, useContext } from "react";
 type MapsContext = {
   allMaps: Queries.MapPageDataQuery["allMaps"]["nodes"];
   selectedMap: Queries.MapPageDataQuery["selectedMap"];
+  baseFloor: number;
+  setBaseFloor: (floor: number) => void;
 };
 
 const MapsContext = React.createContext<MapsContext | undefined>(undefined);

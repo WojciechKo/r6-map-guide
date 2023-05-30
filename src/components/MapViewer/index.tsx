@@ -11,7 +11,7 @@ import { BiRadioCircleMarked } from "react-icons/bi";
 import { useBlueprintViewer } from "./reducers";
 
 const MapViewer: FC = () => {
-  const { selectedMap } = useMaps();
+  const { selectedMap, baseFloor } = useMaps();
   const blueprints = selectedMap!.blueprints;
 
   const { grid } = useMapViewerGrid();
@@ -92,18 +92,21 @@ const MapViewer: FC = () => {
           {...bindWheel()}
           {...bindTap()}
         >
-          {blueprints[index] && (
+          {blueprints[index + baseFloor] && (
             <>
               <LabelContainer>
-                <BlueprintLabel>{blueprints[index].name}</BlueprintLabel>
+                <BlueprintLabel>{blueprints[index + baseFloor].name}</BlueprintLabel>
               </LabelContainer>
               <Blueprint>
                 <Mover style={blueprintMoveStyles}>
                   <Zoomer style={blueprintScaleStyles}>
-                    <img src={blueprints[index].url} />
+                    <img src={blueprints[index + baseFloor].url} />
 
                     {markerPosition && (
-                      <Marker {...markerPosition}>
+                      <Marker
+                        {...markerPosition}
+                        style={{ scale: (2 / blueprintScaleStyles.scale.get()).toString() }}
+                      >
                         <BiRadioCircleMarked />
                       </Marker>
                     )}
