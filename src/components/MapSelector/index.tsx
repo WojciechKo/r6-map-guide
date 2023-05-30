@@ -24,7 +24,7 @@ const MapSelector: FC = () => {
   };
 
   return (
-    <div>
+    <>
       <MapSelectorButton
         text={selectedMap?.name ?? ""}
         isMenuOpen={isMenuOpen}
@@ -36,7 +36,7 @@ const MapSelector: FC = () => {
         onClose={onClose}
         onMapSelected={onMapSelected}
       />
-    </div>
+    </>
   );
 };
 

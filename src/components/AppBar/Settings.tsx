@@ -17,7 +17,7 @@ const Settings = () => {
   }, [setAnchorEl]);
 
   return (
-    <div>
+    <>
       <IconButton
         aria-label="settings"
         aria-controls="appbar-settings"
@@ -47,7 +47,7 @@ const Settings = () => {
         <MenuItem onClick={handleClose}>Will</MenuItem>
         <MenuItem onClick={handleClose}>Come</MenuItem>
       </Menu>
-    </div>
+    </>
   );
 };
 

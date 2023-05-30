@@ -59,7 +59,7 @@ const GridSelector: FC = () => {
   };
 
   return (
-    <div>
+    <>
       <GridSelectorButton
         aria-describedby={id}
         aria-label="settings"
@@ -96,7 +96,7 @@ const GridSelector: FC = () => {
           ))}
         </Container>
       </Popover>
-    </div>
+    </>
   );
 };
 
