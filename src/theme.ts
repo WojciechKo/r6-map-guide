@@ -3,7 +3,7 @@ import { Theme, createTheme } from "@mui/material/styles";
 
 const theme: Theme = createTheme({
   sizes: {
-    mapMenuWidth: "220px",
+    mapMenuWidth: "180px",
   },
   palette: {
     primary: {

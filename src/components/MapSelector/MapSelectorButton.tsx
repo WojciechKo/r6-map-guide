@@ -2,34 +2,18 @@ import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
 import Button from "@mui/material/Button";
 import { styled } from "@mui/material/styles";
-import { animated, useSpring } from "@react-spring/web";
-import React, { useEffect } from "react";
+import { animated } from "@react-spring/web";
+import React, { FC } from "react";
 
 type Props = {
   text: string;
   isMenuOpen: boolean;
-  onClick: () => void;
+  onClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
 };
 
-const MapSelectorButton = React.forwardRef<HTMLButtonElement, Props>(({ text, isMenuOpen, onClick }, ref) => {
-  const [roundedCorners, roundedCornersApi] = useSpring(() => ({
-    borderBottomLeftRadius: "4px",
-    borderBottomRightRadius: "4px",
-  }));
-
-  useEffect(() => {
-    const radius = isMenuOpen ? "0" : "4px";
-
-    roundedCornersApi.start({
-      borderBottomLeftRadius: radius,
-      borderBottomRightRadius: radius,
-    });
-  }, [roundedCornersApi, isMenuOpen]);
-
+const MapSelectorButton: FC<Props> = ({ text, isMenuOpen, onClick }) => {
   return (
     <StyledButton
-      style={roundedCorners}
-      ref={ref}
       $isMenuOpen={isMenuOpen}
       aria-controls="map-picker"
       aria-haspopup="true"
@@ -41,20 +25,18 @@ const MapSelectorButton = React.forwardRef<HTMLButtonElement, Props>(({ text, is
       {text}
     </StyledButton>
   );
-});
+};
 
-const StyledButton = styled(animated(Button))<{ $isMenuOpen: boolean }>(({ theme, $isMenuOpen }) => ({
-  "&&": {
-    width: theme.sizes.mapMenuWidth,
-    justifyContent: "space-between",
-    textTransform: "none",
-    backgroundColor: $isMenuOpen ? theme.palette.secondary.dark : theme.palette.secondary.main,
-    "&:hover": {
-      backgroundColor: theme.palette.secondary.dark,
-    },
-    "& .MuiButton-endIcon": {
-      pointerEvents: "none",
-    },
+const StyledButton = styled(animated(Button), { shouldForwardProp: (prop: string) => !prop.startsWith("$") })<{
+  $isMenuOpen: boolean;
+}>(({ theme, $isMenuOpen }) => ({
+  width: theme.sizes.mapMenuWidth,
+  justifyContent: "space-between",
+  textTransform: "none",
+  borderRadius: $isMenuOpen ? "4px 4px 0 0" : "4px",
+  backgroundColor: $isMenuOpen ? theme.palette.secondary.dark : theme.palette.secondary.main,
+  "& .MuiButton-endIcon": {
+    pointerEvents: "none",
   },
 }));
 

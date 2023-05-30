@@ -8,51 +8,32 @@ import MapSelectorMenu from "./MapSelectorMenu";
 const MapSelector: FC = () => {
   const { selectedMap } = useMaps();
 
-  const [isMenuOpen, setMenuOpen] = useState(false);
-  const anchorRef = React.useRef<HTMLButtonElement>(null);
+  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
+  const isMenuOpen = Boolean(anchorEl);
 
-  // return focus to the button when we transitioned from !open -> open
-  const prevOpen = React.useRef(isMenuOpen);
-  React.useEffect(() => {
-    if (prevOpen.current === true && isMenuOpen === false) {
-      anchorRef.current!.focus();
-    }
-    prevOpen.current = isMenuOpen;
-  }, [isMenuOpen]);
-
-  const handleButtonClick = () => {
-    setMenuOpen((prevOpen) => !prevOpen);
+  const onButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
   };
 
-  const onClickAway = (event: MouseEvent | TouchEvent) => {
-    console.log("onClickAway")
-    event.preventDefault();
-    return 
-    if (!isMenuOpen || anchorRef.current?.contains(event.target as HTMLElement)) {
-      return;
-    }
-
-    setMenuOpen(false);
+  const onClose = () => {
+    setAnchorEl(null);
   };
 
   const onMapSelected = (mapSlug: string) => {
-    setMenuOpen(false);
     navigate(`/maps/${mapSlug}`);
   };
 
   return (
     <div>
       <MapSelectorButton
-        ref={anchorRef}
         text={selectedMap?.name ?? ""}
         isMenuOpen={isMenuOpen}
-        onClick={handleButtonClick}
+        onClick={onButtonClick}
       />
-
       <MapSelectorMenu
-        anchorEl={anchorRef.current}
+        anchorEl={anchorEl}
         isMenuOpen={isMenuOpen}
-        onClickAway={onClickAway}
+        onClose={onClose}
         onMapSelected={onMapSelected}
       />
     </div>

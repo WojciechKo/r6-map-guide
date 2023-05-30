@@ -1,52 +1,57 @@
 import { useMaps } from "@/contexts/MapsContext";
-import ClickAwayListener, { ClickAwayListenerProps } from "@mui/material/ClickAwayListener";
 import Collapse from "@mui/material/Collapse";
 import MenuItem from "@mui/material/MenuItem";
 import MenuList from "@mui/material/MenuList";
-import Paper from "@mui/material/Paper";
-import Popper from "@mui/material/Popper";
+import Popover, { PopoverProps } from "@mui/material/Popover";
 import { styled } from "@mui/material/styles";
 import React, { FC } from "react";
 
 type Props = {
   anchorEl: HTMLElement | null;
   isMenuOpen: boolean;
-  onClickAway: ClickAwayListenerProps["onClickAway"];
+  onClose: PopoverProps["onClose"];
   onMapSelected: (mapSlug: string) => void;
 };
 
-const MapSelectorMenu: FC<Props> = ({ anchorEl, isMenuOpen, onClickAway, onMapSelected }) => {
+const MapSelectorMenu: FC<Props> = ({ anchorEl, isMenuOpen, onClose, onMapSelected }) => {
   const { allMaps, selectedMap } = useMaps();
   return (
-    <Popper open={isMenuOpen} anchorEl={anchorEl} placement={"bottom-end"} transition keepMounted>
-      {({ TransitionProps }) => (
-        <Collapse {...TransitionProps} style={{ transformOrigin: "center top" }}>
-          <StyledPaper sx={{ overflowY: "auto" }}>
-            <ClickAwayListener onClickAway={onClickAway}>
-              <MenuList color={"danger"} sx={{ pt: 0 }} autoFocusItem={isMenuOpen} id="map-picker">
-                {allMaps.map((map) => (
-                  <StyledMenuItem
-                    key={map.slug}
-                    dense={true}
-                    selected={map.slug === selectedMap?.slug}
-                    onClick={() => onMapSelected(map.slug)}
-                  >
-                    {map.name}
-                  </StyledMenuItem>
-                ))}
-              </MenuList>
-            </ClickAwayListener>
-          </StyledPaper>
-        </Collapse>
-      )}
-    </Popper>
+    <StyledPopover
+      open={isMenuOpen}
+      onClose={onClose}
+      anchorEl={anchorEl}
+      anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      transformOrigin={{ vertical: "top", horizontal: "center" }}
+      TransitionComponent={Collapse}
+      keepMounted
+    >
+      <MenuList
+        id="map-picker"
+        sx={{ pt: 0 }}
+        autoFocusItem={isMenuOpen}
+      >
+        {allMaps.map((map) => (
+          <StyledMenuItem
+            key={map.slug}
+            dense={true}
+            selected={map.slug === selectedMap?.slug}
+            onClick={() => onMapSelected(map.slug)}
+          >
+            {map.name}
+          </StyledMenuItem>
+        ))}
+      </MenuList>
+    </StyledPopover>
   );
 };
 
-const StyledPaper = styled(Paper)(({ theme }) => ({
-  width: theme.sizes.mapMenuWidth,
-  maxHeight: `calc(100vh - ${theme.spacing(10)})`,
-  borderRadius: "0 0 4px 4px",
+const StyledPopover = styled(Popover)(({ theme }) => ({
+  "& .MuiPopover-paper": {
+    width: theme.sizes.mapMenuWidth,
+    maxHeight: `calc(100vh - ${theme.spacing(10)})`,
+    overflowY: "auto",
+    borderRadius: "0 0 4px 4px",
+  },
 }));
 
 const StyledMenuItem = styled(MenuItem)(({ theme }) => ({
