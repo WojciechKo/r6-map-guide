@@ -1,6 +1,8 @@
 import { useMaps } from "@/contexts/MapsContext";
 import { useMapViewerGrid } from "@/contexts/MapViewerGridContext";
+import Box from "@mui/material/Box";
 import { styled } from "@mui/material/styles";
+import Typography from "@mui/material/Typography";
 import { animated, useSpring } from "@react-spring/web";
 import { useDrag, useGesture, useWheel } from "@use-gesture/react";
 import React, { FC, useEffect } from "react";
@@ -91,25 +93,46 @@ const MapViewer: FC = () => {
           {...bindTap()}
         >
           {blueprints[index] && (
-            <Blueprint>
-              <Mover style={blueprintMoveStyles}>
-                <Zoomer style={blueprintScaleStyles}>
-                  <img src={blueprints[index].url} />
+            <>
+              <LabelContainer>
+                <BlueprintLabel>{blueprints[index].name}</BlueprintLabel>
+              </LabelContainer>
+              <Blueprint>
+                <Mover style={blueprintMoveStyles}>
+                  <Zoomer style={blueprintScaleStyles}>
+                    <img src={blueprints[index].url} />
 
-                  {markerPosition && (
-                    <Marker {...markerPosition}>
-                      <BiRadioCircleMarked />
-                    </Marker>
-                  )}
-                </Zoomer>
-              </Mover>
-            </Blueprint>
+                    {markerPosition && (
+                      <Marker {...markerPosition}>
+                        <BiRadioCircleMarked />
+                      </Marker>
+                    )}
+                  </Zoomer>
+                </Mover>
+              </Blueprint>
+            </>
           )}
         </BlueprintFrame>
       ))}
     </BlueprintsContainer>
   );
 };
+
+const LabelContainer = styled(Box)(() => ({
+  position: "absolute",
+  width: "100%",
+  display: "flex",
+  justifyContent: "left",
+  zIndex: 1,
+  pointerEvents: "none",
+}));
+
+const BlueprintLabel = styled(Typography)(({ theme }) => ({
+  backgroundColor: theme.palette.secondary.dark,
+  color: theme.palette.secondary.contrastText,
+  borderRadius: "0 0 0.5em 0",
+  padding: "0 0.5em",
+}));
 
 const BlueprintsContainer = styled("div")<{ columns: number; rows: number }>(({ theme, columns, rows }) => ({
   backgroundColor: theme.palette.secondary.main,
