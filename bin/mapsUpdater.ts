@@ -61,7 +61,7 @@ const updateMapsDataTask = async (maps: MapUrl[]) => {
           ),
       },
     ],
-    { rendererOptions: { collapse: false } }
+    { rendererOptions: { collapseSubtasks: false } }
   ).run();
 };
 
